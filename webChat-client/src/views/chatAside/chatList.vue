@@ -13,16 +13,16 @@
   <el-scrollbar>
     <div class="chat-list">
       <div class="user_info" v-if="searchFlag">
-        <template v-for="(item, index) in 5" :key="item">
+        <template v-for="(item, index) in friendList" :key="item">
           <div
             :class="['user_item', { active_user_item: index == currentIndex }]"
             @click="selectPerson(index)"
           >
             <div class="avatar">
-              <el-avatar src="../../../public//img/wuwu.jpeg" />
+              <el-avatar src="/img/wuwu.jpeg" />
             </div>
             <div class="content">
-              <h5>女帝</h5>
+              <h5>{{ item.userName }}</h5>
               <span>摸摸哒</span>
             </div>
           </div>
@@ -33,12 +33,21 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
+import { getFriendList } from '@/api'
 
 const search = ref('')
 const currentIndex = ref(0)
 const searchFlag = ref(true)
+const friendList = ref<any>([])
+
+onMounted(() => {
+  getFriendList(7).then((res: any) => {
+    console.log(res)
+    friendList.value = res.data
+  })
+})
 
 const searchFocus = () => {
   searchFlag.value = false

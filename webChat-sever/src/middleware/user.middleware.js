@@ -14,14 +14,7 @@ const verifyUser = async (ctx, next) => {
   const users = await UserService.findUserByName(userName)
   if (users.length) {
     return ctx.app.emit('error', 'name_is_already_exists', ctx)
-
-    ctx.body = {
-      code: -1002,
-      msg: '用户名已经存在，不能创建~'
-    }
-    return
   }
-
   // 3.执行下一个中间件
   await next()
 }

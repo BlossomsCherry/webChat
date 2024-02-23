@@ -4,6 +4,7 @@ const cors = require('koa2-cors')
 
 const useRouter = require('../router/user')
 const loginRouter = require('../router/login')
+const friendRouter = require('../router/friend')
 
 // 1. 创建app
 const app = new Koa()
@@ -29,5 +30,7 @@ app.use(useRouter.routes())
 app.use(useRouter.allowedMethods())
 app.use(loginRouter.routes())
 app.use(loginRouter.allowedMethods())
+app.use(friendRouter.routes())
+app.use(friendRouter.allowedMethods())
 
 module.exports = app

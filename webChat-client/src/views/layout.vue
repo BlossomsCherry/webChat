@@ -84,7 +84,7 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import chatAside from './chatAside/index.vue'
 import EmojiBox from '@/components/EmojiBox.vue'
 

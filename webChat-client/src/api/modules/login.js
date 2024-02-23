@@ -15,7 +15,7 @@ export const login = (data) => {
 
 export const register = (data) => {
   return WRequest.post({
-    url: '/users/register',
+    url: 'user/register',
     data
   })
 }

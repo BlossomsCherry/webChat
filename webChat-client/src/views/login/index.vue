@@ -92,45 +92,45 @@ const ruleForm = ref<Login>({
   confirmPsw: ''
 })
 
-const validateName = (rule: any, value: any, callback: any) => {
-  if (value === '') {
-    callback(new Error('用户名不能为空'))
-  } else {
-    if (ruleForm.value.password !== '') {
-      if (!ruleFormRef.value) return
-      ruleFormRef.value.validateField('userName', () => null)
-    }
-    callback()
-  }
-}
+// const validateName = (rule: any, value: any, callback: any) => {
+//   if (value === '') {
+//     callback(new Error('用户名不能为空'))
+//   } else {
+//     if (ruleForm.value.password !== '') {
+//       if (!ruleFormRef.value) return
+//       ruleFormRef.value.validateField('userName', () => null)
+//     }
+//     callback()
+//   }
+// }
 
-const validatePass = (rule: any, value: any, callback: any) => {
-  if (value === '') {
-    callback(new Error('密码不能为空'))
-  } else {
-    if (ruleForm.value.password !== '') {
-      if (!ruleFormRef.value) return
-      ruleFormRef.value.validateField('password', () => null)
-    }
-    callback()
-  }
-}
+// const validatePass = (rule: any, value: any, callback: any) => {
+//   if (value === '') {
+//     callback(new Error('密码不能为空'))
+//   } else {
+//     if (ruleForm.value.password !== '') {
+//       if (!ruleFormRef.value) return
+//       ruleFormRef.value.validateField('password', () => null)
+//     }
+//     callback()
+//   }
+// }
 
-const validatePass2 = (rule: any, value: any, callback: any) => {
-  if (value === '') {
-    callback(new Error('请再次输入密码'))
-  } else if (value !== ruleForm.value.password) {
-    callback(new Error('两次输入密码不同！'))
-  } else {
-    callback()
-  }
-}
+// const validatePass2 = (rule: any, value: any, callback: any) => {
+//   if (value === '') {
+//     callback(new Error('请再次输入密码'))
+//   } else if (value !== ruleForm.value.password) {
+//     callback(new Error('两次输入密码不同！'))
+//   } else {
+//     callback()
+//   }
+// }
 
-const rules = reactive<FormRules<typeof ruleForm>>({
-  userName: [{ validator: validateName, trigger: 'blur' }],
-  password: [{ validator: validatePass, trigger: 'blur' }],
-  confirmPsw: [{ validator: validatePass2, trigger: 'blur' }]
-})
+// const rules = reactive<FormRules<typeof ruleForm>>({
+//   userName: [{ validator: validateName, trigger: 'blur' }],
+//   password: [{ validator: validatePass, trigger: 'blur' }],
+//   confirmPsw: [{ validator: validatePass2, trigger: 'blur' }]
+// })
 
 /* 重置表单 */
 const resetForm = () => {
@@ -151,6 +151,7 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 
       resetForm()
 
+      console.log(res)
       ElNotification({
         title: '登录成功',
         message: res.data.userName + '欢迎回来~',
@@ -170,7 +171,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 const registerSubmit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
 
-  register(ruleForm.value).then((res: any) => {
+  const { userName, password } = ruleForm.value
+  register({ userName, password }).then((res: any) => {
     if (res.code === 200) {
       resetForm()
 
