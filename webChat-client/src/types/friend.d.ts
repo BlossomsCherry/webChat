@@ -2,7 +2,7 @@ interface addMessage {
   userId: number
   friendId: number
   message?: string
-  type?: string
+  type?: number
   state?: number
 }
 

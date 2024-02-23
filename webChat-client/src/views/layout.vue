@@ -18,19 +18,19 @@
                 <template v-for="(item, index) in messageList" :key="index">
                   <div :class="['message-item', { user: item.userId == 7 }]">
                     <div class="user_message commonMsg" v-if="item.userId == 7">
-                      <chat-message position="right" v-if="item.message">
+                      <chat-message position="right" v-if="item.type === 0">
                         <span>{{ item.message }}</span>
                       </chat-message>
 
-                      <img :src="item.emoji" alt="" style="width: 100px; margin: 10px" />
+                      <img :src="item.message" alt="" style="width: 100px; margin: 10px" />
                     </div>
 
                     <div class="friend_message commonMsg" v-if="item.userId !== 7">
-                      <chat-message backgroundColor="#373d4b" v-if="item.message">
+                      <chat-message backgroundColor="#373d4b" v-if="item.type === 0">
                         <span>{{ item.message }}</span>
                       </chat-message>
 
-                      <img :src="item.emoji" alt="" style="width: 100px; margin: 10px" />
+                      <img :src="item.message" alt="" style="width: 100px; margin: 10px" />
                     </div>
                     <div class="avatar">
                       <div v-if="item.userId !== 7">
@@ -87,7 +87,7 @@
 import { onMounted, ref } from 'vue'
 import chatAside from './chatAside/index.vue'
 import EmojiBox from '@/components/EmojiBox.vue'
-import { getChatMessage } from '@/api'
+import { getChatMessage, addMessage } from '@/api'
 
 const message = ref('')
 const showEmoji = ref(false)
@@ -95,21 +95,35 @@ const iconList = ref(['icon-videocamera', 'icon-a-ziyuan568ldpi', 'icon-shengyin
 const messageList = ref()
 
 onMounted(() => {
+  getMessage()
+})
+
+/**
+ * 获取聊天记录
+ */
+const getMessage = () => {
   getChatMessage({ userId: 7, friendId: 4 }).then((res: any) => {
     messageList.value = res.data
+    console.log(messageList.value)
   })
-})
+}
 
 const emojiClick = () => {
   showEmoji.value = !showEmoji.value
 }
 
-const sendEmoji = (item: string) => {
-  messageList.value.push({
-    id: 1,
-    emoji: item,
-    sendTime: new Date().toLocaleString()
+const sendEmoji = (item: any) => {
+  console.log(item.url)
+  addMessage({
+    userId: 7,
+    friendId: 4,
+    message: item.url,
+    type: 1,
+    state: 1
+  }).then(() => {
+    getMessage()
   })
+
   showEmoji.value = false
 }
 
@@ -154,7 +168,7 @@ const closeEmoji = () => {
         display: flex;
       }
       .el-container {
-        flex: 7;
+        flex: 6;
 
         .el-header {
           display: flex;

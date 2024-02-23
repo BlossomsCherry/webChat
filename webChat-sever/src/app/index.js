@@ -5,6 +5,7 @@ const cors = require('koa2-cors')
 const useRouter = require('../router/user')
 const loginRouter = require('../router/login')
 const friendRouter = require('../router/friend')
+const emojiRouter = require('../router/emoji')
 
 // 1. 创建app
 const app = new Koa()
@@ -32,5 +33,7 @@ app.use(loginRouter.routes())
 app.use(loginRouter.allowedMethods())
 app.use(friendRouter.routes())
 app.use(friendRouter.allowedMethods())
+app.use(emojiRouter.routes())
+app.use(emojiRouter.allowedMethods())
 
 module.exports = app

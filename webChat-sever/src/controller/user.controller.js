@@ -43,7 +43,6 @@ class UserController {
     // 判断目标用户好友状态
     const isFriend = await userService.isFriend(user.id, friend.id)
 
-    console.log(isFriend)
     if (isFriend.length) {
       switch (isFriend[isFriend.length - 1].state) {
         case '0':

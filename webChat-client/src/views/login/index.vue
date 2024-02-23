@@ -165,7 +165,7 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 
           ElNotification({
             title: '登录成功',
-            message: res.data.userName + '欢迎回来~',
+            message: res.data.userName + '，欢迎回来~',
             type: 'success'
           })
         } else {

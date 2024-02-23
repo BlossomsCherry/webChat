@@ -52,9 +52,15 @@ class FriendService {
     const statement = `SELECT u.userName,fm.userId,fm.friendId,fm.type,fm.state,fm.message,fm.sendTime,u1.userName as friendName
 	  FROM user u LEFT JOIN friend_message fm ON u.id = fm.userId
     LEFT JOIN user u1 ON u1.id = fm.friendId
-    WHERE userId IS NOT NULL AND (friendId = 4 OR  7) AND (userId =7 OR 4) ORDER BY sendTime ASC;`
+    WHERE userId IS NOT NULL AND (userId = ? OR userId = ?) and ( friendId= ? or friendId = ?) ORDER BY sendTime ASC;
+ `
 
-    const [values] = await connection.execute(statement, [userId, friendId])
+    const [values] = await connection.execute(statement, [
+      userId,
+      friendId,
+      userId,
+      friendId
+    ])
 
     return values
   }

@@ -13,8 +13,10 @@
   <el-scrollbar>
     <div class="chat-list">
       <div class="user_info" v-if="searchFlag">
-        <template v-for="(item, index) in friendList" :key="item">
+        <template v-if="!!friendList.length">
           <div
+            v-for="(item, index) in friendList"
+            :key="item"
             :class="['user_item', { active_user_item: index == currentIndex }]"
             @click="selectPerson(index)"
           >
@@ -23,10 +25,12 @@
             </div>
             <div class="content">
               <h5>{{ item.userName }}</h5>
-              <span>摸摸哒</span>
+              <span>{{ item.newMsg }}</span>
+              <div class="date">{{ item.minutes }}</div>
             </div>
           </div>
         </template>
+        <el-empty v-else description="暂无消息" image="/img/empty.png" />
       </div>
     </div>
   </el-scrollbar>
@@ -35,20 +39,42 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { Search } from '@element-plus/icons-vue'
-import { getFriendList } from '@/api'
+import { getFriendList, getChatMessage } from '@/api'
+import { useUserStore } from '@/stores/user'
 
+const userStore = useUserStore()
 const search = ref('')
 const currentIndex = ref(0)
 const searchFlag = ref(true)
 const friendList = ref<any>([])
+const newMsg = ref('')
+const minutes = ref('')
 
 onMounted(() => {
-  const userId: string | null = localStorage.getItem('userId')
+  const userId = localStorage.getItem('userId')
 
-  getFriendList(userId).then((res: any) => {
-    console.log(res)
-    friendList.value = res.data
-  })
+  if (userId) {
+    // 获取好友列表
+    getFriendList(Number(userId)).then(async (res: any) => {
+      friendList.value = res.data
+      userStore.friendList = res.data
+
+      // 获取最新消息
+
+      friendList.value.forEach((item: any) => {
+        getChatMessage({ userId: Number(userId), friendId: item.id }).then((res: any) => {
+          const msg = res.data.filter((item: any) => item.userId === Number(userId))
+          if (msg.length === 0) return
+
+          newMsg.value = msg.length === 0 ? [] : msg[msg.length - 1].message
+          minutes.value = msg.length === 0 ? [] : msg[msg.length - 1].sendTime.slice(10, 15)
+
+          friendList.value.filter((res: any) => res.id === item.id)[0].newMsg = newMsg.value
+          friendList.value.filter((res: any) => res.id === item.id)[0].minutes = minutes.value
+        })
+      })
+    })
+  }
 })
 
 const searchFocus = () => {
@@ -95,17 +121,33 @@ const selectPerson = (index: number) => {
       cursor: pointer;
 
       .content {
+        position: relative;
         padding-left: 10px;
         flex: 1;
+        display: -webkit-box;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2; //当属性值为3，表示超出3行隐藏
 
         span {
           font-size: 12px;
+        }
+
+        .date {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 40px;
+          height: 20px;
+          font-size: 12px;
+          color: #fff;
         }
       }
     }
     .active_user_item {
       background-color: #118bfa;
-      box-shadow: 2px 4px 6px rgba(18, 139, 250, 0.6);
+      box-shadow: 2px 3px 8px rgba(18, 139, 250, 0.6);
     }
   }
 }

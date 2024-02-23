@@ -29,7 +29,7 @@ import chatTool from './chatTool.vue'
     border-bottom-left-radius: 10px;
   }
   .list {
-    flex: 3;
+    flex: 4;
     box-sizing: border-box;
   }
 }

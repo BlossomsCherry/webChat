@@ -7,7 +7,8 @@ export const useUserStore = defineStore('user', {
       username: '',
       avatar: '',
       createTime: ''
-    }
+    },
+    friendList: []
   }),
   actions: {}
 })

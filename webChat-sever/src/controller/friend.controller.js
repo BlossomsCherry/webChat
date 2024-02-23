@@ -38,7 +38,6 @@ class FriendController {
     const { userId, friendId } = ctx.request.body
 
     const result = await FriendService.getChatMessage(userId, friendId)
-    const date = new Date(result[0]).getTime()
 
     // 处理时间格式
     result.forEach(item => {

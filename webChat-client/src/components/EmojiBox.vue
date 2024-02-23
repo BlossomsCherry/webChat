@@ -9,7 +9,7 @@
             :key="index"
             @click="sendEmoji(item)"
           >
-            <img :src="item" alt="" />
+            <img :src="item.url" alt="" />
           </li>
         </ul>
       </div>
@@ -18,11 +18,18 @@
   </div>
 </template>
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { onMounted, ref } from 'vue'
+import { getEmoji } from '@/api'
 
 const emit = defineEmits(['sendEmoji', 'closeEmoji'])
 
-const emojiList = reactive(Object.keys(import.meta.glob('@/assets/img/emoji/*.png')))
+const emojiList: any = ref([])
+
+onMounted(() => {
+  getEmoji().then((res: any) => {
+    emojiList.value = res.data
+  })
+})
 
 /* 发送表情 */
 const sendEmoji: (item: string) => void = (item) => {
@@ -33,7 +40,6 @@ const sendEmoji: (item: string) => void = (item) => {
 const closeEmoji = () => {
   emit('closeEmoji')
 }
-
 </script>
 
 <style lang="scss" scoped>

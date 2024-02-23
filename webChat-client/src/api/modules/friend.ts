@@ -5,7 +5,7 @@ import WRequest from '../request'
  * @param {*} userId
  * @returns
  */
-export function getFriendList(userId: string | null) {
+export function getFriendList(userId: number) {
   return WRequest.post({
     url: '/friend/list',
     data: {
