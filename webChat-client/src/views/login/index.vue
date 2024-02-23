@@ -34,7 +34,6 @@
           ref="ruleFormRef"
           :model="ruleForm"
           status-icon
-          :rules="rules"
           class="demo-form-inline"
         >
           <el-form-item prop="userName">
@@ -74,10 +73,13 @@
 import { ElNotification } from 'element-plus'
 import 'element-plus/theme-chalk/el-notification.css'
 
-import { reactive, ref } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { login, register } from '@/api'
+import { setToken } from '@/utils/saveToken'
+import { useLoginStore } from '@/stores/login'
+import { useUserStore } from '@/stores/user'
 
 const ruleFormRef = ref<FormInstance>()
 const router = useRouter()
@@ -85,6 +87,7 @@ const flag = ref(true)
 const Span1Ref = ref(null)
 const preBoxRef = ref<HTMLDivElement | null>(null)
 const imgUrl = ref('/img/wuwu.jpeg')
+const loginStore = useLoginStore()
 
 const ruleForm = ref<Login>({
   userName: '婉儿',
@@ -92,29 +95,29 @@ const ruleForm = ref<Login>({
   confirmPsw: ''
 })
 
-// const validateName = (rule: any, value: any, callback: any) => {
-//   if (value === '') {
-//     callback(new Error('用户名不能为空'))
-//   } else {
-//     if (ruleForm.value.password !== '') {
-//       if (!ruleFormRef.value) return
-//       ruleFormRef.value.validateField('userName', () => null)
-//     }
-//     callback()
-//   }
-// }
+const validateName = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('用户名不能为空'))
+  } else {
+    if (ruleForm.value.password !== '') {
+      if (!ruleFormRef.value) return
+      ruleFormRef.value.validateField('userName', () => null)
+    }
+    callback()
+  }
+}
 
-// const validatePass = (rule: any, value: any, callback: any) => {
-//   if (value === '') {
-//     callback(new Error('密码不能为空'))
-//   } else {
-//     if (ruleForm.value.password !== '') {
-//       if (!ruleFormRef.value) return
-//       ruleFormRef.value.validateField('password', () => null)
-//     }
-//     callback()
-//   }
-// }
+const validatePass = (rule: any, value: any, callback: any) => {
+  if (value === '') {
+    callback(new Error('密码不能为空'))
+  } else {
+    if (ruleForm.value.password !== '') {
+      if (!ruleFormRef.value) return
+      ruleFormRef.value.validateField('password', () => null)
+    }
+    callback()
+  }
+}
 
 // const validatePass2 = (rule: any, value: any, callback: any) => {
 //   if (value === '') {
@@ -126,11 +129,11 @@ const ruleForm = ref<Login>({
 //   }
 // }
 
-// const rules = reactive<FormRules<typeof ruleForm>>({
-//   userName: [{ validator: validateName, trigger: 'blur' }],
-//   password: [{ validator: validatePass, trigger: 'blur' }],
-//   confirmPsw: [{ validator: validatePass2, trigger: 'blur' }]
-// })
+const rules = reactive<FormRules<typeof ruleForm>>({
+  userName: [{ validator: validateName, trigger: 'blur' }],
+  password: [{ validator: validatePass, trigger: 'blur' }]
+  // confirmPsw: [{ validator: validatePass2, trigger: 'blur' }]
+})
 
 /* 重置表单 */
 const resetForm = () => {
@@ -142,26 +145,36 @@ const resetForm = () => {
 }
 
 /* 登录 */
+const userStore = useUserStore()
 const loginSubmit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
 
-  login(ruleForm.value).then((res: any) => {
-    if (res.code === 0) {
-      router.push('/layout')
+  formEl.validate((valid) => {
+    if (valid) {
+      loginStore.clickStatus = 1
 
-      resetForm()
+      login(ruleForm.value).then((res: any) => {
+        if (res.code === 0) {
+          userStore.user.userId = res.data.id
+          localStorage.setItem('userId', res.data.id)
 
-      console.log(res)
-      ElNotification({
-        title: '登录成功',
-        message: res.data.userName + '欢迎回来~',
-        type: 'success'
-      })
-    } else {
-      ElNotification({
-        title: '登录失败',
-        message: res.msg,
-        type: 'error'
+          setToken(res.data.token)
+          router.replace('/layout')
+
+          resetForm()
+
+          ElNotification({
+            title: '登录成功',
+            message: res.data.userName + '欢迎回来~',
+            type: 'success'
+          })
+        } else {
+          ElNotification({
+            title: '登录失败',
+            message: res.msg,
+            type: 'error'
+          })
+        }
       })
     }
   })

@@ -16,8 +16,8 @@
             <el-scrollbar>
               <div class="message">
                 <template v-for="(item, index) in messageList" :key="index">
-                  <div :class="['message-item', { user: !!item.id }]">
-                    <div class="user_message commonMsg" v-if="item.id == 1">
+                  <div :class="['message-item', { user: item.userId == 7 }]">
+                    <div class="user_message commonMsg" v-if="item.userId == 7">
                       <chat-message position="right" v-if="item.message">
                         <span>{{ item.message }}</span>
                       </chat-message>
@@ -25,7 +25,7 @@
                       <img :src="item.emoji" alt="" style="width: 100px; margin: 10px" />
                     </div>
 
-                    <div class="friend_message commonMsg" v-if="item.id == 0">
+                    <div class="friend_message commonMsg" v-if="item.userId !== 7">
                       <chat-message backgroundColor="#373d4b" v-if="item.message">
                         <span>{{ item.message }}</span>
                       </chat-message>
@@ -33,17 +33,17 @@
                       <img :src="item.emoji" alt="" style="width: 100px; margin: 10px" />
                     </div>
                     <div class="avatar">
-                      <div v-if="item.id == 0">
+                      <div v-if="item.userId !== 7">
                         <el-avatar src="img/waoku.jpg" />
-                        <span class="name" style="color: #fff">哇酷哇酷</span>
-                        <span class="sendDate">{{ `${item.sendTime.slice(10, 15)} AM` }}</span>
-                      </div>
-
-                      <div v-if="item.id == 1">
-                        <span class="name">哇酷哇酷</span>
+                        <span class="name">{{ item.userName }}</span>
                         <span class="sendDate" style="color: #fff">{{
                           `${item.sendTime.slice(10, 15)} AM`
                         }}</span>
+                      </div>
+
+                      <div v-if="item.userId == 7">
+                        <span class="name" style="color: #fff">{{ item.userName }}</span>
+                        <span class="sendDate">{{ `${item.sendTime.slice(10, 15)} AM` }}</span>
                         <el-avatar src="img/waoku.jpg" />
                       </div>
                     </div>
@@ -87,82 +87,18 @@
 import { onMounted, ref } from 'vue'
 import chatAside from './chatAside/index.vue'
 import EmojiBox from '@/components/EmojiBox.vue'
-
-interface Message {
-  id: number | string
-  message?: string
-  emoji?: string
-  sendTime: string
-}
+import { getChatMessage } from '@/api'
 
 const message = ref('')
 const showEmoji = ref(false)
 const iconList = ref(['icon-videocamera', 'icon-a-ziyuan568ldpi', 'icon-shengyinluzhi'])
-const messageList = ref<Message[]>([
-  {
-    id: 0,
-    message: '你好',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 1,
-    message: '你好',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 0,
-    message: '瓦达西',
-    sendTime: '2022-12-12 12:12:12'
-  },
+const messageList = ref()
 
-  {
-    id: 1,
-    message: '瓦达西',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 0,
-    message: '你好',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 1,
-    message: '你好',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 0,
-    message: '瓦达西',
-    sendTime: '2022-12-12 12:12:12'
-  },
-
-  {
-    id: 1,
-    message: '瓦达西',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 0,
-    message: '你好',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 1,
-    message: '你好',
-    sendTime: '2022-12-12 12:12:12'
-  },
-  {
-    id: 0,
-    message: '瓦达西',
-    sendTime: '2022-12-12 12:12:12'
-  },
-
-  {
-    id: 1,
-    message: '瓦达西',
-    sendTime: '2022-12-12 12:12:12'
-  }
-])
+onMounted(() => {
+  getChatMessage({ userId: 7, friendId: 4 }).then((res: any) => {
+    messageList.value = res.data
+  })
+})
 
 const emojiClick = () => {
   showEmoji.value = !showEmoji.value

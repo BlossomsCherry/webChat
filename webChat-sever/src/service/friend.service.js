@@ -19,6 +19,45 @@ class FriendService {
 
     return res
   }
+
+  /**
+   * 添加聊天消息
+   * @param {*} userId
+   * @param {*} friendId
+   * @param {*} message
+   * @returns
+   */
+  async addMessage(userId, friendId, message, type, state) {
+    const statement = `INSERT INTO friend_message (userId, friendId, message, type, state) VALUES (?, ?, ?, ?, ?);`
+
+    const [values] = await connection.execute(statement, [
+      userId,
+      friendId,
+      message,
+      type,
+      state
+    ])
+
+    return values
+  }
+
+  /**
+   * 查询聊天消息
+   * @param {*} userId
+   * @param {*} friendId
+   * @returns
+   */
+  async getChatMessage(userId, friendId) {
+    // const statement = `select * from friend_message where userId = ? and friendId = ?;`
+    const statement = `SELECT u.userName,fm.userId,fm.friendId,fm.type,fm.state,fm.message,fm.sendTime,u1.userName as friendName
+	  FROM user u LEFT JOIN friend_message fm ON u.id = fm.userId
+    LEFT JOIN user u1 ON u1.id = fm.friendId
+    WHERE userId IS NOT NULL AND (friendId = 4 OR  7) AND (userId =7 OR 4) ORDER BY sendTime ASC;`
+
+    const [values] = await connection.execute(statement, [userId, friendId])
+
+    return values
+  }
 }
 
 module.exports = new FriendService()

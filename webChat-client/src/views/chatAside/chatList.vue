@@ -19,7 +19,7 @@
             @click="selectPerson(index)"
           >
             <div class="avatar">
-              <el-avatar src="/img/wuwu.jpeg" />
+              <el-avatar :src="item.avatar" />
             </div>
             <div class="content">
               <h5>{{ item.userName }}</h5>
@@ -43,7 +43,9 @@ const searchFlag = ref(true)
 const friendList = ref<any>([])
 
 onMounted(() => {
-  getFriendList(7).then((res: any) => {
+  const userId: string | null = localStorage.getItem('userId')
+
+  getFriendList(userId).then((res: any) => {
     console.log(res)
     friendList.value = res.data
   })

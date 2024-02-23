@@ -39,10 +39,26 @@ class UserService {
    * @param {*} friendId 好友id
    * @returns
    */
-  async addFriend(userId, friendId) {
-    const statement = `INSERT INTO user_friend (userId, friendId) VALUES (?, ?);`
+  async addFriend(userId, friendId, state) {
+    const statement = `INSERT INTO user_friend (userId, friendId ,state) VALUES (?, ?, ?);`
+
+    const [values] = await connection.execute(statement, [
+      userId,
+      friendId,
+      state
+    ])
+    return values
+  }
+
+  /**
+   * 查询与目标用户好友状态
+   * @param {*} userId
+   */
+  async isFriend(userId, friendId) {
+    const statement = `SELECT * FROM user_friend WHERE userId = ? AND friendId = ?;`
 
     const [values] = await connection.execute(statement, [userId, friendId])
+
     return values
   }
 
