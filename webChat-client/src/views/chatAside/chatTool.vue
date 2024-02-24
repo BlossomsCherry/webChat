@@ -1,7 +1,7 @@
 <template>
   <div class="chat-tool">
     <div class="avatar" @click="showUserInfo()">
-      <el-avatar src="/img/waoku.jpg" />
+      <el-avatar :src="user.avatar" />
     </div>
     <div class="tool">
       <div class="menu" ref="menuRef">
@@ -26,10 +26,10 @@
     <div class="userInfo" v-if="userInfo">
       <div class="header">
         <div class="left">
-          <el-avatar src="/img/waoku.jpg" size="large" />
+          <el-avatar :src="user.avatar" size="large" />
         </div>
         <div class="right">
-          <div class="userName">澜清</div>
+          <div class="userName">{{ user.userName }}</div>
           <div class="emil">2234867838@qq.com</div>
           <div class="status">
             <div class="round"></div>
@@ -49,7 +49,7 @@
 </template>
 
 <script lang="ts" setup>
-import { getCurrentInstance, ref } from 'vue'
+import { getCurrentInstance, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 
 const { proxy }: any = getCurrentInstance()
@@ -57,7 +57,13 @@ const menuRef = ref(null)
 const router = useRouter()
 const sliderRef = ref<HTMLDivElement | null>(null)
 const isCollapse = ref(true)
+const user: any = ref('')
 const iconList = ref(['icon-message-dots', 'icon-users', 'icon-grid', 'icon-github', 'icon-shezhi'])
+
+onMounted(() => {
+  user.value = JSON.parse(localStorage.getItem('user'))
+  console.log(user.value)
+})
 
 const menuItemClick = (index: number) => {
   const menuItemHeight = proxy.$refs.menuRef.lastChild.firstElementChild.clientHeight
@@ -72,7 +78,6 @@ const showUserInfo = () => {
 
 /* 退出登录 */
 const logout = () => {
-  // removeToken()
   router.replace('./login')
 }
 </script>

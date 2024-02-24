@@ -7,17 +7,18 @@
         </el-aside>
         <el-container>
           <el-header height="80px">
-            <div class="name">哇酷哇酷</div>
+            <div class="name">{{ indexFriend.userName }}</div>
             <div class="icon">
               <el-icon><MoreFilled /></el-icon>
             </div>
           </el-header>
+
           <el-main>
             <el-scrollbar>
               <div class="message">
                 <template v-for="(item, index) in messageList" :key="index">
-                  <div :class="['message-item', { user: item.userId == 7 }]">
-                    <div class="user_message commonMsg" v-if="item.userId == 7">
+                  <div :class="['message-item', { user: item.userId == userId }]">
+                    <div class="user_message commonMsg" v-if="item.userId == userId">
                       <chat-message position="right" v-if="item.type === 0">
                         <span>{{ item.message }}</span>
                       </chat-message>
@@ -25,26 +26,27 @@
                       <img :src="item.message" alt="" style="width: 100px; margin: 10px" />
                     </div>
 
-                    <div class="friend_message commonMsg" v-if="item.userId !== 7">
+                    <div class="friend_message commonMsg" v-if="item.userId == friendId">
                       <chat-message backgroundColor="#373d4b" v-if="item.type === 0">
                         <span>{{ item.message }}</span>
                       </chat-message>
 
                       <img :src="item.message" alt="" style="width: 100px; margin: 10px" />
                     </div>
+
                     <div class="avatar">
-                      <div v-if="item.userId !== 7">
-                        <el-avatar src="img/waoku.jpg" />
+                      <div v-if="item.userId == friendId">
+                        <el-avatar :src="item.userAvatar" />
                         <span class="name">{{ item.userName }}</span>
                         <span class="sendDate" style="color: #fff">{{
                           `${item.sendTime.slice(10, 15)} AM`
                         }}</span>
                       </div>
 
-                      <div v-if="item.userId == 7">
+                      <div v-else>
                         <span class="name" style="color: #fff">{{ item.userName }}</span>
                         <span class="sendDate">{{ `${item.sendTime.slice(10, 15)} AM` }}</span>
-                        <el-avatar src="img/waoku.jpg" />
+                        <el-avatar :src="item.userAvatar" />
                       </div>
                     </div>
                   </div>
@@ -52,6 +54,7 @@
               </div>
             </el-scrollbar>
           </el-main>
+
           <el-footer height="150px">
             <div class="tool">
               <template v-for="(item, index) in iconList" :key="index">
@@ -66,7 +69,7 @@
                 <emoji-box
                   v-if="showEmoji"
                   @sendEmoji="sendEmoji"
-                  @closeEmoji="closeEmoji"
+                  @closeEmoji="showEmoji = false"
                 ></emoji-box>
               </div>
               <el-input
@@ -75,6 +78,11 @@
                 :autosize="{ minRows: 2, maxRows: 4 }"
                 resize="none"
               ></el-input>
+              <div class="expression sendMsg">
+                <div class="icon" @click="sendMessage">
+                  <img src="../assets/img/emoji/rocket.png" alt="" />
+                </div>
+              </div>
             </div>
           </el-footer>
         </el-container>
@@ -84,41 +92,57 @@
 </template>
 
 <script lang="ts" setup>
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import chatAside from './chatAside/index.vue'
 import EmojiBox from '@/components/EmojiBox.vue'
 import { getChatMessage, addMessage } from '@/api'
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 
+const userStore = useUserStore()
 const message = ref('')
 const showEmoji = ref(false)
 const iconList = ref(['icon-videocamera', 'icon-a-ziyuan568ldpi', 'icon-shengyinluzhi'])
-const messageList = ref()
+const messageList: any = ref([])
+const userId = localStorage.getItem('userId')
+const indexFriend: any = ref([])
+const { friendId, currentIndex, allFriendList } = storeToRefs(userStore)
 
 onMounted(() => {
+  setTimeout(() => {
+    getMessage()
+    indexFriend.value = allFriendList.value[currentIndex.value]
+  }, 10)
+})
+
+watch(currentIndex, () => {
   getMessage()
+  indexFriend.value = allFriendList.value[currentIndex.value]
 })
 
 /**
  * 获取聊天记录
  */
 const getMessage = () => {
-  getChatMessage({ userId: 7, friendId: 4 }).then((res: any) => {
+  getChatMessage({ userId: Number(userId), friendId: Number(friendId.value) }).then((res: any) => {
     messageList.value = res.data
-    console.log(messageList.value)
+
+    console.log(res.data, '消息')
   })
 }
 
 const emojiClick = () => {
-  showEmoji.value = !showEmoji.value
+  showEmoji.value = true
 }
 
+const type = ref(0) // 消息类型
 const sendEmoji = (item: any) => {
-  console.log(item.url)
+  type.value = 1
   addMessage({
-    userId: 7,
-    friendId: 4,
+    userId: Number(userId),
+    friendId: Number(userStore.friendId),
     message: item.url,
-    type: 1,
+    type: type.value,
     state: 1
   }).then(() => {
     getMessage()
@@ -127,8 +151,19 @@ const sendEmoji = (item: any) => {
   showEmoji.value = false
 }
 
-const closeEmoji = () => {
-  showEmoji.value = false
+const sendMessage = () => {
+  type.value = 0
+
+  addMessage({
+    userId: Number(userId),
+    friendId: Number(userStore.friendId),
+    message: message.value,
+    type: type.value,
+    state: 1
+  }).then(() => {
+    getMessage()
+    message.value = ''
+  })
 }
 </script>
 
@@ -251,6 +286,11 @@ const closeEmoji = () => {
                   width: 100%;
                 }
               }
+            }
+
+            .sendMsg {
+              margin-left: 10px;
+              background-color: #282b38;
             }
           }
         }

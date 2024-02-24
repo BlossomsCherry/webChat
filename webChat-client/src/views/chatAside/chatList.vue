@@ -25,7 +25,7 @@
             </div>
             <div class="content">
               <h5>{{ item.userName }}</h5>
-              <span>{{ item.newMsg }}</span>
+              <span v-if="true">{{ item.newMsg }}</span>
               <div class="date">{{ item.minutes }}</div>
             </div>
           </div>
@@ -38,17 +38,17 @@
 
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
-import { Search } from '@element-plus/icons-vue'
 import { getFriendList, getChatMessage } from '@/api'
 import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
 const search = ref('')
-const currentIndex = ref(0)
 const searchFlag = ref(true)
 const friendList = ref<any>([])
 const newMsg = ref('')
 const minutes = ref('')
+const { friendId, friendInfo, currentIndex, allFriendList } = storeToRefs(userStore)
 
 onMounted(() => {
   const userId = localStorage.getItem('userId')
@@ -56,18 +56,20 @@ onMounted(() => {
   if (userId) {
     // 获取好友列表
     getFriendList(Number(userId)).then(async (res: any) => {
+      allFriendList.value = res.data
       friendList.value = res.data
-      userStore.friendList = res.data
+      console.log(res)
+
+      friendId.value = res.data[currentIndex.value].id
 
       // 获取最新消息
-
       friendList.value.forEach((item: any) => {
         getChatMessage({ userId: Number(userId), friendId: item.id }).then((res: any) => {
-          const msg = res.data.filter((item: any) => item.userId === Number(userId))
+          const msg = res.data.filter((item: any) => item.friendId === Number(userId))
           if (msg.length === 0) return
 
-          newMsg.value = msg.length === 0 ? [] : msg[msg.length - 1].message
-          minutes.value = msg.length === 0 ? [] : msg[msg.length - 1].sendTime.slice(10, 15)
+          newMsg.value = msg[msg.length - 1].message
+          minutes.value = msg[msg.length - 1].sendTime.slice(10, 15)
 
           friendList.value.filter((res: any) => res.id === item.id)[0].newMsg = newMsg.value
           friendList.value.filter((res: any) => res.id === item.id)[0].minutes = minutes.value
@@ -85,8 +87,17 @@ const clearClick = () => {
   searchFlag.value = true
 }
 
+/**
+ * 选择聊天对象
+ * @param index
+ */
 const selectPerson = (index: number) => {
   currentIndex.value = index
+  localStorage.setItem('currentIndex', currentIndex.value.toString())
+
+  friendInfo.value = friendList.value[index]
+
+  friendId.value = friendList.value[index].id
 }
 </script>
 

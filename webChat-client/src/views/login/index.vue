@@ -1,5 +1,13 @@
 <template>
   <div class="chat-login">
+    <div class="container">
+      <div class="display-1 t">
+        <span class="title">欢迎</span>
+        <span class="title">加入</span>
+        <span class="title">WebChat</span>
+        <span class="title">聊天</span>
+      </div>
+    </div>
     <div class="container-app">
       <!-- 登录 -->
       <div class="login">
@@ -73,7 +81,7 @@
 import { ElNotification } from 'element-plus'
 import 'element-plus/theme-chalk/el-notification.css'
 
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { login, register } from '@/api'
@@ -145,7 +153,6 @@ const resetForm = () => {
 }
 
 /* 登录 */
-const userStore = useUserStore()
 const loginSubmit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
 
@@ -155,8 +162,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 
       login(ruleForm.value).then((res: any) => {
         if (res.code === 0) {
-          userStore.user.userId = res.data.id
           localStorage.setItem('userId', res.data.id)
+          localStorage.setItem('user', JSON.stringify(res.data))
 
           setToken(res.data.token)
           router.replace('/layout')
@@ -166,13 +173,15 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
           ElNotification({
             title: '登录成功',
             message: res.data.userName + '，欢迎回来~',
-            type: 'success'
+            type: 'success',
+            duration: 2500
           })
         } else {
           ElNotification({
             title: '登录失败',
             message: res.msg,
-            type: 'error'
+            type: 'error',
+            duration: 2500
           })
         }
       })
@@ -192,13 +201,15 @@ const registerSubmit = (formEl: FormInstance | undefined) => {
       ElNotification({
         title: '注册成功',
         message: ruleForm.value.userName + '欢迎加入~',
-        type: 'success'
+        type: 'success',
+        duration: 2500
       })
     } else {
       ElNotification({
         title: '注册失败',
         message: res.msg,
-        type: 'error'
+        type: 'error',
+        duration: 2500
       })
     }
   })
@@ -223,6 +234,16 @@ const loginClick = () => {
 
   flag.value = true
 }
+
+/* 标题动画 */
+onMounted(() => {
+  const title: any = document.getElementsByClassName('title')
+  console.log(title)
+
+  for (let i = 0; i < title.length; i++) {
+    title[i].style.animationDelay = i * 0.1 + 's'
+  }
+})
 </script>
 
 <style lang="less" scoped>
@@ -232,7 +253,36 @@ const loginClick = () => {
 .chat-login {
   width: 100%;
   height: 100vh;
+  text-align: center;
   background: linear-gradient(90deg, #fad5d7, #bde0f1);
+
+  .container {
+    position: absolute;
+    left: 50%;
+    top: 10%;
+    transform: translateX(-50%);
+    font-size: 40px;
+    color: #fff;
+    font-weight: 800;
+    .t {
+      display: flex;
+      overflow: hidden;
+      animation-name: hc;
+      animation-duration: 1s;
+      animation-fill-mode: both;
+    }
+
+    @keyframes hc {
+      form {
+        transform: translateY(40%);
+        opacity: 0;
+      }
+      to {
+        transform: translateY(40%);
+        opacity: 1;
+      }
+    }
+  }
   .container-app {
     position: absolute;
     display: flex;

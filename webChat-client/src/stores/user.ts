@@ -2,13 +2,10 @@ import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore('user', {
   state: () => ({
-    user: {
-      userId: '',
-      username: '',
-      avatar: '',
-      createTime: ''
-    },
-    friendList: []
+    friendInfo: [],
+    friendId: '',
+    allFriendList: [],
+    currentIndex: localStorage.getItem('currentIndex') || 0
   }),
   actions: {}
 })
