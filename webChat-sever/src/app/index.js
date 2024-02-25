@@ -1,4 +1,6 @@
 const Koa = require('koa')
+const { createServer } = require('http')
+const { Server } = require('socket.io')
 const bodyParser = require('koa-bodyparser')
 const cors = require('koa2-cors')
 
@@ -9,8 +11,25 @@ const emojiRouter = require('../router/emoji')
 
 // 1. 创建app
 const app = new Koa()
+const httpServer = createServer(app.callback())
 
-// 2. 对app使用中间件
+// 2.建立WebSocket连接
+const io = new Server(httpServer)
+
+io.on('connection', socket => {
+  // 监听用户登录
+  socket.on('login', data => {
+    // 接受到消息给他广播出去
+    socket.broadcast.emit('message', data.userName)
+  })
+
+  socket.on('leave', data => {
+    // 接受到消息给他广播出去
+    socket.broadcast.emit('friendLeave', data)
+  })
+})
+
+// 3. 对app使用中间件
 app.use(
   cors({
     origin: function (ctx) {
@@ -26,6 +45,7 @@ app.use(
     allowHeaders: ['Content-Type', 'Authorization', 'Accept']
   })
 )
+
 app.use(bodyParser())
 app.use(useRouter.routes())
 app.use(useRouter.allowedMethods())
@@ -36,4 +56,4 @@ app.use(friendRouter.allowedMethods())
 app.use(emojiRouter.routes())
 app.use(emojiRouter.allowedMethods())
 
-module.exports = app
+module.exports = httpServer

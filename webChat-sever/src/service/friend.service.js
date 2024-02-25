@@ -7,19 +7,19 @@ class FriendService {
    * @returns
    */
   async selectFriend(userId) {
-    const statement = `SELECT * FROM user LEFT JOIN user_friend ON user.id = user_friend.userId  WHERE userId IS NOT NULL AND userId = ? AND state = '0';`
+    // const statement = `SELECT * FROM user LEFT JOIN user_friend ON user.id = user_friend.userId  WHERE userId IS NOT NULL AND userId = ? AND state = '0';`
+    const statement = `SELECT u.userName, u1.userName friendName, u.id userId, u1.id friendId, u1.status friend_status, u1.avatar friend_avatar, u1.phone friend_phone, state
+	  FROM user u
+	  LEFT JOIN user_friend fm ON u.id = fm.userId
+    LEFT JOIN user u1 ON fm.friendId = u1.id
+	  WHERE userId  IS NOT NULL AND userId = ? AND state = 0;`
 
     const [values] = await connection.execute(statement, [userId])
 
     // 通过好友id数组查询所有好友信息
     if (values.length === 0) return []
 
-    const friendIdArr = values.map(item => item.friendId)
-    const statement2 = `SELECT * FROM user WHERE id IN (${friendIdArr})`
-
-    const [res] = await connection.execute(statement2)
-
-    return res
+    return values
   }
 
   /**
@@ -49,21 +49,27 @@ class FriendService {
    * @param {*} friendId
    * @returns
    */
-  async getChatMessage(userId, friendId) {
+  async getChatMessage(friendList) {
     const statement = `SELECT u.userName, u.avatar as userAvatar,fm.userId,fm.friendId,fm.type,fm.state,fm.message,fm.sendTime,u1.userName as friendName,u1.avatar as friendAvatar
 	  FROM user u LEFT JOIN friend_message fm ON u.id = fm.userId
     LEFT JOIN user u1 ON u1.id = fm.friendId
     WHERE userId IS NOT NULL AND (userId = ? OR userId = ?) and ( friendId= ? or friendId = ?) ORDER BY sendTime ASC;
  `
 
-    const [values] = await connection.execute(statement, [
-      userId,
-      friendId,
-      userId,
-      friendId
-    ])
+    let i = 0
+    let result = []
+    while (i < friendList.length) {
+      const [values] = await connection.execute(statement, [
+        friendList[i].userId,
+        friendList[i].friendId,
+        friendList[i].userId,
+        friendList[i].friendId
+      ])
+      i++
+      result.push(values)
+    }
 
-    return values
+    return result
   }
 }
 

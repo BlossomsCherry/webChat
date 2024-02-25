@@ -4,5 +4,5 @@ require('./utils/error')
 
 /* 启动服务器 */
 app.listen(SERVER_POST, () => {
-  console.log('webChat服务器启动成功~,端口3000')
+  console.log('webChat服务器启动成功~,端口：' + SERVER_POST)
 })

@@ -3,9 +3,9 @@ import { defineStore } from 'pinia'
 export const useUserStore = defineStore('user', {
   state: () => ({
     friendInfo: [],
-    friendId: '',
+    friendId: 0,
     allFriendList: [],
-    currentIndex: localStorage.getItem('currentIndex') || 0
+    currentIndex: Number(localStorage.getItem('currentIndex')) || 0
   }),
   actions: {}
 })

@@ -31,7 +31,7 @@ export function addMessage(data: addMessage) {
  * @param data
  * @returns
  */
-export function getChatMessage(data: getMessage) {
+export function getChatMessage(data: [getMessage]) {
   return WRequest.post({
     url: '/friend/getChatMessage',
     data

@@ -21,10 +21,10 @@
             @click="selectPerson(index)"
           >
             <div class="avatar">
-              <el-avatar :src="item.avatar" />
+              <el-avatar :src="item.friend_avatar" />
             </div>
             <div class="content">
-              <h5>{{ item.userName }}</h5>
+              <h5>{{ item.friendName }}</h5>
               <span v-if="true">{{ item.newMsg }}</span>
               <div class="date">{{ item.minutes }}</div>
             </div>
@@ -46,36 +46,13 @@ const userStore = useUserStore()
 const search = ref('')
 const searchFlag = ref(true)
 const friendList = ref<any>([])
-const newMsg = ref('')
-const minutes = ref('')
 const { friendId, friendInfo, currentIndex, allFriendList } = storeToRefs(userStore)
 
 onMounted(() => {
   const userId = localStorage.getItem('userId')
 
   if (userId) {
-    // 获取好友列表
-    getFriendList(Number(userId)).then(async (res: any) => {
-      allFriendList.value = res.data
-      friendList.value = res.data
-      console.log(res)
-
-      friendId.value = res.data[currentIndex.value].id
-
-      // 获取最新消息
-      friendList.value.forEach((item: any) => {
-        getChatMessage({ userId: Number(userId), friendId: item.id }).then((res: any) => {
-          const msg = res.data.filter((item: any) => item.friendId === Number(userId))
-          if (msg.length === 0) return
-
-          newMsg.value = msg[msg.length - 1].message
-          minutes.value = msg[msg.length - 1].sendTime.slice(10, 15)
-
-          friendList.value.filter((res: any) => res.id === item.id)[0].newMsg = newMsg.value
-          friendList.value.filter((res: any) => res.id === item.id)[0].minutes = minutes.value
-        })
-      })
-    })
+    getFriendAndMsg(userId)
   }
 })
 
@@ -97,7 +74,28 @@ const selectPerson = (index: number) => {
 
   friendInfo.value = friendList.value[index]
 
-  friendId.value = friendList.value[index].id
+  friendId.value = friendList.value[index].friendId
+}
+
+/* 获取好友列表及最新消息 */
+const getFriendAndMsg = (userId: string) => {
+  getFriendList(Number(userId)).then(async (res: any) => {
+    allFriendList.value = res.data
+    friendList.value = res.data
+
+    friendId.value = res.data[currentIndex.value].friendId
+
+    // 获取最新消息
+    getChatMessage(friendList.value).then((res: any) => {
+      const msg = res.data
+      if (msg.length === 0) return
+
+      res.data.forEach((item: any, index: number) => {
+        friendList.value[index].newMsg = item[item.length - 1].message
+        friendList.value[index].minutes = item[item.length - 1].sendTime.slice(10, 15)
+      })
+    })
+  })
 }
 </script>
 
@@ -130,6 +128,21 @@ const selectPerson = (index: number) => {
       background-color: #313746;
       color: #fff;
       cursor: pointer;
+
+      .avatar {
+        position: relative;
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0px;
+          right: 1px;
+          width: 10px;
+          height: 10px;
+          background-color: #23e58a;
+          // border: 3px solid #313746;
+          border-radius: 50px;
+        }
+      }
 
       .content {
         position: relative;

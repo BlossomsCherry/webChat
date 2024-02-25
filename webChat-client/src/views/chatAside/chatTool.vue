@@ -49,8 +49,12 @@
 </template>
 
 <script lang="ts" setup>
+import { ElNotification } from 'element-plus'
+import 'element-plus/theme-chalk/el-notification.css'
+
 import { getCurrentInstance, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
+import socket from '@/utils/socket'
 
 const { proxy }: any = getCurrentInstance()
 const menuRef = ref(null)
@@ -62,7 +66,6 @@ const iconList = ref(['icon-message-dots', 'icon-users', 'icon-grid', 'icon-gith
 
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem('user'))
-  console.log(user.value)
 })
 
 const menuItemClick = (index: number) => {
@@ -78,6 +81,7 @@ const showUserInfo = () => {
 
 /* 退出登录 */
 const logout = () => {
+  socket.emit('leave', user.value.userName)
   router.replace('./login')
 }
 </script>

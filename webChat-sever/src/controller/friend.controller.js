@@ -35,13 +35,16 @@ class FriendController {
 
   // 获取聊天消息
   getChatMessage = async (ctx, next) => {
-    const { userId, friendId } = ctx.request.body
+    // const { userId, friendId } = ctx.request.body
+    const friendList = ctx.request.body
 
-    const result = await FriendService.getChatMessage(userId, friendId)
+    const result = await FriendService.getChatMessage(friendList)
 
     // 处理时间格式
     result.forEach(item => {
-      item.sendTime = item.sendTime.toLocaleString()
+      item.forEach(element => {
+        element.sendTime = element.sendTime.toLocaleString()
+      })
     })
 
     ctx.body = {

@@ -87,7 +87,7 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { login, register } from '@/api'
 import { setToken } from '@/utils/saveToken'
 import { useLoginStore } from '@/stores/login'
-import { useUserStore } from '@/stores/user'
+import socket from '@/utils/socket'
 
 const ruleFormRef = ref<FormInstance>()
 const router = useRouter()
@@ -168,6 +168,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
           setToken(res.data.token)
           router.replace('/layout')
 
+          socket.emit('login', ruleForm.value)
+
           resetForm()
 
           ElNotification({
@@ -238,7 +240,6 @@ const loginClick = () => {
 /* 标题动画 */
 onMounted(() => {
   const title: any = document.getElementsByClassName('title')
-  console.log(title)
 
   for (let i = 0; i < title.length; i++) {
     title[i].style.animationDelay = i * 0.1 + 's'
