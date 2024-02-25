@@ -19,12 +19,25 @@ const httpServer = createServer(app.callback())
 const io = new Server(httpServer)
 
 io.on('connection', socket => {
+  // 监听客户端发送的心跳消息
+  socket.on('heartbeat', () => {
+    console.log(`收到客户端${socket.id}的心跳消息`)
+    // 发送心跳响应给客户端
+    socket.emit('heartbeat')
+  })
+
+  // 监听客户端断开连接事件
+  socket.on('disconnect', () => {
+    console.log(`客户端断开连接:${socket.id}`)
+  })
+
   // 监听用户登录
   socket.on('login', data => {
     // 接受到消息给他广播出去
     socket.broadcast.emit('message', data.userName)
   })
 
+  // 好友离开
   socket.on('leave', async data => {
     // 修改用户状态
     await UserService.updateStatus({

@@ -9,7 +9,7 @@ import chatTool from './chatTool.vue'
       <chat-tool></chat-tool>
     </div>
     <div class="list">
-      <chat-list></chat-list>
+      <router-view></router-view>
     </div>
   </div>
 </template>

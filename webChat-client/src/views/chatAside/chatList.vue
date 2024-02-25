@@ -5,11 +5,20 @@
       size="small"
       placeholder="搜索"
       :clearable="true"
+      :prefix-icon="Search"
       @focus="searchFocus"
       @clear="clearClick"
     />
-    <el-icon><Search /></el-icon>
+    <div class="addFriend" @click="addFlag = !addFlag">
+      <el-icon><Plus /></el-icon>
+    </div>
+
+    <div class="selectBox" v-if="addFlag">
+      <div class="item">发起群聊</div>
+      <div class="item" @click="addClick">加好友/群</div>
+    </div>
   </div>
+
   <el-scrollbar>
     <div class="chat-list">
       <div class="user_info" v-if="searchFlag">
@@ -38,6 +47,8 @@
 </template>
 
 <script lang="ts" setup>
+import { Search } from '@element-plus/icons-vue'
+
 import { ref, onMounted } from 'vue'
 import { getFriendList, getChatMessage } from '@/api'
 import { useUserStore } from '@/stores/user'
@@ -45,14 +56,15 @@ import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
 const search = ref('')
+const addFlag = ref(false)
 const searchFlag = ref(true)
-const { friendId, friendInfo, currentIndex, friendList } = storeToRefs(userStore)
+const { friendId, friendInfo, currentIndex, friendList, addFG } = storeToRefs(userStore)
 
 onMounted(() => {
   const userId = localStorage.getItem('userId')
 
   if (userId) {
-    getFriendAndMsg(userId)
+    getFriendAndMsg(Number(userId))
   }
 })
 
@@ -62,6 +74,12 @@ const searchFocus = () => {
 
 const clearClick = () => {
   searchFlag.value = true
+}
+
+/* 添加好友/群 */
+const addClick = () => {
+  addFG.value = 1
+  console.log(addFG.value)
 }
 
 /**
@@ -77,13 +95,18 @@ const selectPerson = (index: number) => {
   friendId.value = friendList.value[index].friendId
 }
 
-/* 获取好友列表及最新消息 */
-const getFriendAndMsg = (userId: string) => {
+/**
+ * 获取好友列表及最新消息
+ * @param userId
+ */
+const getFriendAndMsg = (userId: number) => {
   getFriendList(Number(userId)).then(async (res: any) => {
     friendList.value = res.data
     console.log(friendList.value)
 
-    friendId.value = res.data[currentIndex.value].friendId
+    friendId.value = res.data[currentIndex.value]?.friendId
+
+    if (res.data.length == 0) return
 
     // 获取最新消息
     getChatMessage(friendList.value).then((res: any) => {
@@ -101,15 +124,56 @@ const getFriendAndMsg = (userId: string) => {
 
 <style lang="scss" scoped>
 .search {
+  position: relative;
   display: flex;
   padding: 20px 10px 10px 18px;
   background-color: #282b38;
   align-items: center;
 
-  .el-icon {
+  .addFriend {
+    display: flex;
+    width: 30px;
+    height: 25px;
     margin-left: 10px;
-    color: #74798a;
+    border-radius: 3px;
+    background-color: #2c313f;
+    justify-content: center;
+    align-items: center;
     cursor: pointer;
+
+    :deep(.el-icon) {
+      color: #74798a;
+    }
+    &:hover {
+      background-color: #118bfa;
+      :deep(.el-icon) {
+        color: #fff !important;
+      }
+    }
+  }
+
+  .selectBox {
+    position: absolute;
+    left: 145px;
+    top: 50px;
+    padding: 5px;
+    font-size: 14px;
+    border-radius: 5px;
+    color: rgba(225, 225, 225, 0.9);
+    background-color: #2c313f;
+    z-index: 99;
+
+    .item {
+      padding: 2px 20px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .item:nth-child(1) {
+      margin-bottom: 6px;
+    }
+    .item:hover {
+      background-color: rgba(225, 225, 225, 0.2);
+    }
   }
 }
 .chat-list {

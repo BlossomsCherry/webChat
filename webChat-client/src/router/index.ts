@@ -19,7 +19,19 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/layout',
     name: 'layout',
-    component: () => import('@/views/layout.vue')
+    component: () => import('@/views/layout.vue'),
+    children: [
+      {
+        path: '/chat',
+        name: 'chat',
+        component: () => import('@/views/chatAside/chatList.vue')
+      },
+      {
+        path: '/friend',
+        name: 'friend',
+        component: () => import('@/views/chatAside/chatFriend.vue')
+      }
+    ]
   }
 ]
 

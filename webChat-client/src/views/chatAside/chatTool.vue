@@ -15,7 +15,7 @@
           <template v-for="(item, index) in iconList" :key="index">
             <el-menu-item :index="String(index)" @click="menuItemClick(index)">
               <el-icon>
-                <span :class="['iconfont', item]"></span>
+                <span :class="['iconfont', item.name]"></span>
               </el-icon>
             </el-menu-item>
           </template>
@@ -38,7 +38,7 @@
         </div>
       </div>
       <div class="content">
-        <div class="tag">签名：xxxx</div>
+        <div class="tag">{{ `签名：${user.tag}` }}</div>
         <div>所在地：xxxx</div>
       </div>
       <div class="footer">
@@ -49,9 +49,6 @@
 </template>
 
 <script lang="ts" setup>
-import { ElNotification } from 'element-plus'
-import 'element-plus/theme-chalk/el-notification.css'
-
 import { getCurrentInstance, ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import socket from '@/utils/socket'
@@ -62,7 +59,13 @@ const router = useRouter()
 const sliderRef = ref<HTMLDivElement | null>(null)
 const isCollapse = ref(true)
 const user: any = ref('')
-const iconList = ref(['icon-message-dots', 'icon-users', 'icon-grid', 'icon-github', 'icon-shezhi'])
+const iconList = ref([
+  { name: 'icon-message-dots', path: '/chat' },
+  { name: 'icon-users', path: '/friend' },
+  { name: 'icon-grid', path: '' },
+  { name: 'icon-github', path: '' },
+  { name: 'icon-shezhi', path: '' }
+])
 
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem('user'))
@@ -72,6 +75,9 @@ const menuItemClick = (index: number) => {
   const menuItemHeight = proxy.$refs.menuRef.lastChild.firstElementChild.clientHeight
 
   if (sliderRef.value) sliderRef.value.style.top = 32 + index * menuItemHeight + 'px'
+
+  const path = iconList.value[index].path
+  router.push(path)
 }
 
 const userInfo = ref(false)

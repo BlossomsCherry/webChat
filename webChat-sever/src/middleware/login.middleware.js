@@ -12,7 +12,6 @@ const { PUBLIC_KEY } = require('../config/secret')
 /* 用户登录验证 */
 const verifyLogin = async (ctx, next) => {
   const { userName, password } = ctx.request.body
-
   // 1.判断用户名和密码是否为空
   if (!userName || !password) {
     return ctx.app.emit('error', NAME_OR_PASSWORD_IS_REQUIRED, ctx)
@@ -23,12 +22,18 @@ const verifyLogin = async (ctx, next) => {
   const user = users[0]
 
   if (!user) {
-    return ctx.app.emit('error', NAME_IS_NOT_EXISTS, ctx)
+    // return ctx.app.emit('error', NAME_IS_NOT_EXISTS, ctx)
+    return (ctx.body = {
+      msg: '用户不存在！'
+    })
   }
 
   // 3.查询数据库中的密码和用户传递密码是否一致
   if (user.password !== md5password(password)) {
-    return ctx.app.emit('error', PASSWORD_IS_ERROR, ctx)
+    // return ctx.app.emit('error', PASSWORD_IS_ERROR, ctx)
+    return (ctx.body = {
+      msg: '密码错误！'
+    })
   }
 
   // 4.修改用户的在线状态

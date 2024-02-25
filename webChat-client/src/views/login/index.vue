@@ -5,7 +5,6 @@
         <span class="title">欢迎</span>
         <span class="title">加入</span>
         <span class="title">WebChat</span>
-        <span class="title">聊天</span>
       </div>
     </div>
     <div class="container-app">
@@ -87,6 +86,8 @@ import type { FormInstance, FormRules } from 'element-plus'
 import { login, register } from '@/api'
 import { setToken } from '@/utils/saveToken'
 import { useLoginStore } from '@/stores/login'
+import { useUserStore } from '@/stores/user'
+import { storeToRefs } from 'pinia'
 import socket from '@/utils/socket'
 
 const ruleFormRef = ref<FormInstance>()
@@ -96,6 +97,7 @@ const Span1Ref = ref(null)
 const preBoxRef = ref<HTMLDivElement | null>(null)
 const imgUrl = ref('/img/wuwu.jpeg')
 const loginStore = useLoginStore()
+const { userId } = storeToRefs(useUserStore())
 
 const ruleForm = ref<Login>({
   userName: '婉儿',
@@ -162,6 +164,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 
       login(ruleForm.value).then((res: any) => {
         if (res.code === 0) {
+          console.log(res)
+          userId.value = res.data.id
           localStorage.setItem('userId', res.data.id)
           localStorage.setItem('user', JSON.stringify(res.data))
 

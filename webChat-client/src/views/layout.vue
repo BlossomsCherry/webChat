@@ -5,9 +5,10 @@
         <el-aside width="200px">
           <chat-aside></chat-aside>
         </el-aside>
+
         <el-container>
           <el-header height="80px">
-            <div class="name">{{ indexFriend?.userName }}</div>
+            <div class="name">{{ indexFriend?.friendName }}</div>
             <div class="icon">
               <el-icon><MoreFilled /></el-icon>
             </div>
@@ -90,11 +91,20 @@
         </el-container>
       </el-container>
     </div>
+
+    <div class="searchPerson" v-if="!!addFG">
+      <div class="title">
+        <span>搜索</span>
+        <el-icon @click="addFG = 0"><Close /></el-icon>
+      </div>
+      <el-input placeholder="输入搜索关键词" :prefix-icon="Search"></el-input>
+    </div>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { ElNotification } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 import 'element-plus/theme-chalk/el-notification.css'
 
 import { onMounted, ref, watch, nextTick } from 'vue'
@@ -112,7 +122,7 @@ const iconList = ref(['icon-videocamera', 'icon-a-ziyuan568ldpi', 'icon-shengyin
 const messageList: any = ref([])
 const userId = Number(localStorage.getItem('userId'))
 const indexFriend: any = ref([])
-const { friendId, currentIndex, friendList } = storeToRefs(userStore)
+const { friendId, currentIndex, friendList, addFG } = storeToRefs(userStore)
 
 socket.on('message', (name: any) => {
   getFriendList(userId).then((res: any) => {
@@ -155,6 +165,8 @@ watch(currentIndex, () => {
  * 获取聊天记录
  */
 const getMessage = () => {
+  if (friendId.value === -1) return
+
   getChatMessage([{ userId: userId, friendId: friendId.value }]).then((res: any) => {
     messageList.value = res.data[0]
   })
@@ -235,6 +247,31 @@ const msgInput = () => {
   width: 100%;
   height: 100vh;
   background-color: #979da7;
+  .searchPerson {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    padding: 10px 20px;
+    width: 500px;
+    height: 80%;
+    border-radius: 5px;
+    background-color: #81b39f;
+
+    :deep(.el-icon) {
+      position: absolute;
+      right: 10px;
+      font-size: 18px;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .title {
+      margin-bottom: 10px;
+      text-align: center;
+      color: #fff;
+    }
+  }
   .wrapper-app {
     position: absolute;
     width: 70%;
