@@ -34,6 +34,18 @@ class UserService {
   }
 
   /**
+   * 修改用户在线状态
+   * @param {*} id
+   * @param {*} status
+   */
+  async updateStatus(data) {
+    const { id, status } = data
+    const statement = `UPDATE user SET status = ? WHERE id = ?;`
+
+    await connection.execute(statement, [status, id])
+  }
+
+  /**
    * 添加好友
    * @param {*} userId 用户id
    * @param {*} friendId 好友id

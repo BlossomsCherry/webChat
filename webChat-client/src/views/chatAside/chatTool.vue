@@ -81,7 +81,7 @@ const showUserInfo = () => {
 
 /* 退出登录 */
 const logout = () => {
-  socket.emit('leave', user.value.userName)
+  socket.emit('leave', user.value)
   router.replace('./login')
 }
 </script>

@@ -19,7 +19,7 @@ const verifyLogin = async (ctx, next) => {
   }
 
   // 2.判断该用户是否在数据库中是否存在
-  const users = await UserService.findUserByName(userName)
+  let users = await UserService.findUserByName(userName)
   const user = users[0]
 
   if (!user) {
@@ -31,8 +31,12 @@ const verifyLogin = async (ctx, next) => {
     return ctx.app.emit('error', PASSWORD_IS_ERROR, ctx)
   }
 
-  // 4.将user对象存储到ctx中
-  ctx.user = user
+  // 4.修改用户的在线状态
+  UserService.updateStatus({ id: user.id, status: 1 })
+  users = await UserService.findUserByName(userName)
+
+  // 5.将user对象存储到ctx中
+  ctx.user = users[0]
 
   await next()
 }

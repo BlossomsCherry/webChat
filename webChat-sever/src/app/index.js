@@ -9,6 +9,8 @@ const loginRouter = require('../router/login')
 const friendRouter = require('../router/friend')
 const emojiRouter = require('../router/emoji')
 
+const UserService = require('../service/user.service')
+
 // 1. 创建app
 const app = new Koa()
 const httpServer = createServer(app.callback())
@@ -23,9 +25,15 @@ io.on('connection', socket => {
     socket.broadcast.emit('message', data.userName)
   })
 
-  socket.on('leave', data => {
+  socket.on('leave', async data => {
+    // 修改用户状态
+    await UserService.updateStatus({
+      id: data.id,
+      status: 0
+    })
+
     // 接受到消息给他广播出去
-    socket.broadcast.emit('friendLeave', data)
+    socket.broadcast.emit('friendLeave', data.userName)
   })
 })
 

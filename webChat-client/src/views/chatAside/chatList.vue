@@ -22,10 +22,11 @@
           >
             <div class="avatar">
               <el-avatar :src="item.friend_avatar" />
+              <div class="avatar_status" v-if="!!item.friend_status"></div>
             </div>
             <div class="content">
               <h5>{{ item.friendName }}</h5>
-              <span v-if="true">{{ item.newMsg }}</span>
+              <span>{{ item.newMsg }}</span>
               <div class="date">{{ item.minutes }}</div>
             </div>
           </div>
@@ -45,8 +46,7 @@ import { storeToRefs } from 'pinia'
 const userStore = useUserStore()
 const search = ref('')
 const searchFlag = ref(true)
-const friendList = ref<any>([])
-const { friendId, friendInfo, currentIndex, allFriendList } = storeToRefs(userStore)
+const { friendId, friendInfo, currentIndex, friendList } = storeToRefs(userStore)
 
 onMounted(() => {
   const userId = localStorage.getItem('userId')
@@ -80,8 +80,8 @@ const selectPerson = (index: number) => {
 /* 获取好友列表及最新消息 */
 const getFriendAndMsg = (userId: string) => {
   getFriendList(Number(userId)).then(async (res: any) => {
-    allFriendList.value = res.data
     friendList.value = res.data
+    console.log(friendList.value)
 
     friendId.value = res.data[currentIndex.value].friendId
 
@@ -131,8 +131,7 @@ const getFriendAndMsg = (userId: string) => {
 
       .avatar {
         position: relative;
-        &::after {
-          content: '';
+        .avatar_status {
           position: absolute;
           top: 0px;
           right: 1px;

@@ -100,7 +100,7 @@ import 'element-plus/theme-chalk/el-notification.css'
 import { onMounted, ref, watch, nextTick } from 'vue'
 import chatAside from './chatAside/index.vue'
 import EmojiBox from '@/components/EmojiBox.vue'
-import { getChatMessage, addMessage } from '@/api'
+import { getChatMessage, addMessage, getFriendList } from '@/api'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import socket from '@/utils/socket'
@@ -112,35 +112,43 @@ const iconList = ref(['icon-videocamera', 'icon-a-ziyuan568ldpi', 'icon-shengyin
 const messageList: any = ref([])
 const userId = Number(localStorage.getItem('userId'))
 const indexFriend: any = ref([])
-const { friendId, currentIndex, allFriendList } = storeToRefs(userStore)
+const { friendId, currentIndex, friendList } = storeToRefs(userStore)
 
 socket.on('message', (name: any) => {
-  ElNotification({
-    message: name + '上线了',
-    type: 'success',
-    duration: 2500
+  getFriendList(userId).then((res: any) => {
+    friendList.value = res.data
+
+    ElNotification({
+      message: name + '上线了',
+      type: 'success',
+      duration: 2500
+    })
   })
 })
 
 socket.on('friendLeave', (name: any) => {
-  ElNotification({
-    message: name + '下线了',
-    type: 'error',
-    duration: 2500
+  getFriendList(userId).then((res: any) => {
+    friendList.value = res.data
+
+    ElNotification({
+      message: name + '下线了',
+      type: 'error',
+      duration: 2500
+    })
   })
 })
 
 onMounted(() => {
   setTimeout(() => {
     getMessage()
-    indexFriend.value = allFriendList.value[currentIndex.value]
+    indexFriend.value = friendList.value[currentIndex.value]
   }, 10)
 })
 
 /* 监听当前聊天对象变化，重新获取聊天记录 */
 watch(currentIndex, () => {
   getMessage()
-  indexFriend.value = allFriendList.value[currentIndex.value]
+  indexFriend.value = friendList.value[currentIndex.value]
 })
 
 /**
