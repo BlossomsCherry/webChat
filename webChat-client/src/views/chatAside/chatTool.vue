@@ -69,6 +69,7 @@ const iconList = ref([
 
 onMounted(() => {
   user.value = JSON.parse(localStorage.getItem('user'))
+  menuItemClick(0)
 })
 
 const menuItemClick = (index: number) => {
@@ -88,6 +89,11 @@ const showUserInfo = () => {
 /* 退出登录 */
 const logout = () => {
   socket.emit('leave', user.value)
+  // 断开socket连接
+  socket.disconnect()
+
+  localStorage.removeItem('user')
+  localStorage.removeItem('currentIndex')
   router.replace('./login')
 }
 </script>

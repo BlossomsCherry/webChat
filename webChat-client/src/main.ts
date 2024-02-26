@@ -13,7 +13,7 @@ socket.io.on('reconnect_failed', () => {
 // 定时发送心跳消息
 const heartbeatInterval = setInterval(() => {
   socket.emit('heartbeat')
-}, 5000) // 每隔 5 秒发送一次心跳消息
+}, 50 * 1000) // 每隔 50 秒发送一次心跳消息
 
 // 监听服务器的心跳响应
 socket.on('heartbeat', () => {

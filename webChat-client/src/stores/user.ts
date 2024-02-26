@@ -7,6 +7,7 @@ export const useUserStore = defineStore('user', {
     friendId: -1,
     friendList: [],
     addFG: 0,
+    allFriendMessage: [],
     currentIndex: Number(localStorage.getItem('currentIndex')) || 0
   }),
   actions: {}

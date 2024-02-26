@@ -172,7 +172,7 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
           setToken(res.data.token)
           router.replace('/layout')
 
-          socket.emit('login', ruleForm.value)
+          socket.emit('login', ruleForm.value.userName)
 
           resetForm()
 

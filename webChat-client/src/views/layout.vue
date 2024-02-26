@@ -27,7 +27,7 @@
                       <img :src="item.message" v-else alt="" style="width: 100px; margin: 10px" />
                     </div>
 
-                    <div class="friend_message commonMsg" v-if="item.userId == friendId">
+                    <div class="friend_message commonMsg" v-else>
                       <chat-message backgroundColor="#373d4b" v-if="item.type === 0">
                         <span>{{ item.message }}</span>
                       </chat-message>
@@ -110,7 +110,7 @@ import 'element-plus/theme-chalk/el-notification.css'
 import { onMounted, ref, watch, nextTick } from 'vue'
 import chatAside from './chatAside/index.vue'
 import EmojiBox from '@/components/EmojiBox.vue'
-import { getChatMessage, addMessage, getFriendList } from '@/api'
+import { addMessage, getFriendList } from '@/api'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import socket from '@/utils/socket'
@@ -122,26 +122,27 @@ const iconList = ref(['icon-videocamera', 'icon-a-ziyuan568ldpi', 'icon-shengyin
 const messageList: any = ref([])
 const userId = Number(localStorage.getItem('userId'))
 const indexFriend: any = ref([])
-const { friendId, currentIndex, friendList, addFG } = storeToRefs(userStore)
+const { friendId, currentIndex, friendList, addFG, allFriendMessage } = storeToRefs(userStore)
 
-socket.on('message', (name: any) => {
+socket.on('message', (userInfo: any) => {
+  console.log(userInfo)
   getFriendList(userId).then((res: any) => {
     friendList.value = res.data
 
     ElNotification({
-      message: name + '上线了',
+      message: userInfo.userName + '上线了',
       type: 'success',
       duration: 2500
     })
   })
 })
 
-socket.on('friendLeave', (name: any) => {
+socket.on('friendLeave', (userInfo: any) => {
   getFriendList(userId).then((res: any) => {
     friendList.value = res.data
 
     ElNotification({
-      message: name + '下线了',
+      message: userInfo.userName + '下线了',
       type: 'error',
       duration: 2500
     })
@@ -152,7 +153,7 @@ onMounted(() => {
   setTimeout(() => {
     getMessage()
     indexFriend.value = friendList.value[currentIndex.value]
-  }, 10)
+  }, 100)
 })
 
 /* 监听当前聊天对象变化，重新获取聊天记录 */
@@ -166,10 +167,7 @@ watch(currentIndex, () => {
  */
 const getMessage = () => {
   if (friendId.value === -1) return
-
-  getChatMessage([{ userId: userId, friendId: friendId.value }]).then((res: any) => {
-    messageList.value = res.data[0]
-  })
+  messageList.value = allFriendMessage.value[currentIndex.value]
 }
 
 const emojiClick = () => {

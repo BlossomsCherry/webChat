@@ -18,7 +18,30 @@ const httpServer = createServer(app.callback())
 // 2.建立WebSocket连接
 const io = new Server(httpServer)
 
+// 在线用户列表
+const onlineUsers = new Map()
+
 io.on('connection', socket => {
+  socket.on('login', userName => {
+    // 添加用户到在线用户列表
+    onlineUsers.set(socket.id, userName)
+    console.log(onlineUsers)
+
+    socket.broadcast.emit('message', { userId: socket.id, userName })
+  })
+
+  // 监听客户端断开连接事件
+  socket.on('disconnect', () => {
+    console.log(`客户端断开连接:${socket.id}`)
+
+    // 从在线用户列表中移除用户
+    const userName = onlineUsers.get(socket.id)
+    onlineUsers.delete(socket.id)
+
+    // 发送下线通知给其他在线用户
+    socket.broadcast.emit('friendLeave', { userId: socket.id, userName })
+  })
+
   // 监听客户端发送的心跳消息
   socket.on('heartbeat', () => {
     console.log(`收到客户端${socket.id}的心跳消息`)
@@ -26,28 +49,23 @@ io.on('connection', socket => {
     socket.emit('heartbeat')
   })
 
-  // 监听客户端断开连接事件
-  socket.on('disconnect', () => {
-    console.log(`客户端断开连接:${socket.id}`)
-  })
-
   // 监听用户登录
-  socket.on('login', data => {
-    // 接受到消息给他广播出去
-    socket.broadcast.emit('message', data.userName)
-  })
+  // socket.on('login', data => {
+  //   // 接受到消息给他广播出去
+  //   socket.broadcast.emit('message', data.userName)
+  // })
 
   // 好友离开
-  socket.on('leave', async data => {
-    // 修改用户状态
-    await UserService.updateStatus({
-      id: data.id,
-      status: 0
-    })
+  // socket.on('leave', async data => {
+  //   // 修改用户状态
+  //   await UserService.updateStatus({
+  //     id: data.id,
+  //     status: 0
+  //   })
 
-    // 接受到消息给他广播出去
-    socket.broadcast.emit('friendLeave', data.userName)
-  })
+  //   // 接受到消息给他广播出去
+  //   socket.broadcast.emit('friendLeave', data.userName)
+  // })
 })
 
 // 3. 对app使用中间件

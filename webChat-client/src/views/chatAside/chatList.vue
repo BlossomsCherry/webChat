@@ -58,7 +58,8 @@ const userStore = useUserStore()
 const search = ref('')
 const addFlag = ref(false)
 const searchFlag = ref(true)
-const { friendId, friendInfo, currentIndex, friendList, addFG } = storeToRefs(userStore)
+const { friendId, friendInfo, currentIndex, friendList, addFG, allFriendMessage } =
+  storeToRefs(userStore)
 
 onMounted(() => {
   const userId = localStorage.getItem('userId')
@@ -111,6 +112,7 @@ const getFriendAndMsg = (userId: number) => {
     // 获取最新消息
     getChatMessage(friendList.value).then((res: any) => {
       const msg = res.data
+      allFriendMessage.value = res.data
       if (msg.length === 0) return
 
       res.data.forEach((item: any, index: number) => {
