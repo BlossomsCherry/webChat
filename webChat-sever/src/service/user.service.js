@@ -22,6 +22,17 @@ class UserService {
   }
 
   /**
+   * 查询所有用户
+   * @returns
+   */
+  async searchAllPerson() {
+    const statement = `SELECT * FROM user`
+    const [values] = await connection.execute(statement)
+
+    return values
+  }
+
+  /**
    * 数据库查询用户名是否存在
    * @param {*} userName
    * @returns
@@ -52,6 +63,7 @@ class UserService {
    * @returns
    */
   async addFriend(userId, friendId, state) {
+    console.log(state)
     const statement = `INSERT INTO user_friend (userId, friendId ,state) VALUES (?, ?, ?);`
 
     const [values] = await connection.execute(statement, [
@@ -59,6 +71,9 @@ class UserService {
       friendId,
       state
     ])
+
+    await connection.execute(statement, [friendId, userId, 3])
+
     return values
   }
 
@@ -89,6 +104,20 @@ class UserService {
       friendId,
       userId
     ])
+
+    return values
+  }
+
+  /**
+   * 更新用户头像
+   * @param {*} userId
+   * @param {*} avatarUrl
+   * @returns
+   */
+  async updateUserAvatar(userId, avatarUrl) {
+    const statement = `UPDATE user SET avatar = ? WHERE id = ?;`
+
+    const [values] = await connection.execute(statement, [avatarUrl, userId])
 
     return values
   }

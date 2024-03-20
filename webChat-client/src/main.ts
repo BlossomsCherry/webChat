@@ -10,19 +10,20 @@ socket.io.on('reconnect_failed', () => {
   console.log('webSocket连接失败')
 })
 
+// 监听与服务器的连接状态
+socket.on('connect', () => {
+  localStorage.setItem('userSocketId', socket.id!)
+  console.log('与服务器连接成功', socket.id)
+})
+
 // 定时发送心跳消息
 const heartbeatInterval = setInterval(() => {
   socket.emit('heartbeat')
-}, 50 * 1000) // 每隔 50 秒发送一次心跳消息
+}, 30 * 1000) // 每隔 30 秒发送一次心跳消息
 
 // 监听服务器的心跳响应
 socket.on('heartbeat', () => {
   console.log('收到服务器的心跳响应')
-})
-
-// 监听与服务器的连接状态
-socket.on('connect', () => {
-  console.log('与服务器连接成功')
 })
 
 socket.on('disconnect', () => {

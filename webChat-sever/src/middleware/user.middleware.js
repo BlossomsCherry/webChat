@@ -1,5 +1,9 @@
 const UserService = require('../service/user.service')
 const md5password = require('../utils/md5-password')
+let {
+  NAME_OR_PASSWORD_IS_REQUIRED,
+  NAME_IS_ALREADY_EXISTS
+} = require('../config/error')
 
 /* 验证用户中间件 */
 const verifyUser = async (ctx, next) => {
@@ -7,16 +11,15 @@ const verifyUser = async (ctx, next) => {
   // 1.判断用户名和密码是否为空
   const { userName, password } = ctx.request.body
   if (!userName || !password) {
-    return ctx.app.emit('error', 'name_or_password_is_required', ctx)
+    NAME_OR_PASSWORD_IS_REQUIRED = new Error('用户名和密码不能为空')
+    return ctx.app.emit('error', NAME_OR_PASSWORD_IS_REQUIRED, ctx)
   }
 
   // 2.判断name是否在数据库中是否存在
   const users = await UserService.findUserByName(userName)
   if (users.length) {
-    // return ctx.app.emit('error', 'name_is_already_exists', ctx)
-    return (ctx.body = {
-      msg: '用户名已经存在，不能创建~'
-    })
+    NAME_IS_ALREADY_EXISTS = new Error('用户名已经存在，不能创建~')
+    return ctx.app.emit('error', NAME_IS_ALREADY_EXISTS, ctx)
   }
   // 3.执行下一个中间件
   await next()

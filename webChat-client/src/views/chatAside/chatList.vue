@@ -14,7 +14,7 @@
     </div>
 
     <div class="selectBox" v-if="addFlag">
-      <div class="item">发起群聊</div>
+      <div class="item" @click="showCreateGroup = true">发起群聊</div>
       <div class="item" @click="addClick">加好友/群</div>
     </div>
   </div>
@@ -24,17 +24,20 @@
       <div class="user_info" v-if="searchFlag">
         <template v-if="!!friendList.length">
           <div
-            v-for="(item, index) in friendList"
+            v-for="(item, index) in chatList"
             :key="item"
             :class="['user_item', { active_user_item: index == currentIndex }]"
             @click="selectPerson(index)"
           >
             <div class="avatar">
-              <el-avatar :src="item.friend_avatar" />
+              <el-avatar :src="item.friend_avatar || item.imgurl" v-if="item.friend_avatar" />
+              <div v-else class="group_avatar">
+                <img v-for="(key, index) in groupUserAvatar" :key="index" :src="key" />
+              </div>
               <div class="avatar_status" v-if="!!item.friend_status"></div>
             </div>
             <div class="content">
-              <h5>{{ item.friendName }}</h5>
+              <h5>{{ item.friendName || item.groupName }}</h5>
               <span>{{ item.newMsg }}</span>
               <div class="date">{{ item.minutes }}</div>
             </div>
@@ -48,24 +51,34 @@
 
 <script lang="ts" setup>
 import { Search } from '@element-plus/icons-vue'
-
+import { useCommonStore } from '@/stores/common'
 import { ref, onMounted } from 'vue'
-import { getFriendList, getChatMessage } from '@/api'
+import { getFriendList, getChatMessage, searchGroup, searchGroupMember } from '@/api'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
+const commonStore = useCommonStore()
+const { showCreateGroup, groupId, groupUserAvatar } = storeToRefs(commonStore)
 const search = ref('')
 const addFlag = ref(false)
 const searchFlag = ref(true)
 const { friendId, friendInfo, currentIndex, friendList, addFG, allFriendMessage } =
   storeToRefs(userStore)
+const chatList = ref<any>([])
 
-onMounted(() => {
+onMounted(async () => {
   const userId = localStorage.getItem('userId')
 
   if (userId) {
-    getFriendAndMsg(Number(userId))
+    await getFriendAndMsg(Number(userId))
+    searchGroup(Number(userId)).then((res: any) => {
+      chatList.value = friendList.value.concat(res.data)
+    })
+
+    searchGroupMember(groupId.value).then((res: any) => {
+      groupUserAvatar.value = res.data.map((item: any) => item.user_avatar)
+    })
   }
 })
 
@@ -80,7 +93,7 @@ const clearClick = () => {
 /* 添加好友/群 */
 const addClick = () => {
   addFG.value = 1
-  console.log(addFG.value)
+  addFlag.value = false
 }
 
 /**
@@ -93,7 +106,9 @@ const selectPerson = (index: number) => {
 
   friendInfo.value = friendList.value[index]
 
-  friendId.value = friendList.value[index].friendId
+  friendId.value = friendList.value[index]?.friendId
+  groupId.value = friendList.value[index]?.group_id
+  console.log(groupId.value)
 }
 
 /**
@@ -101,23 +116,26 @@ const selectPerson = (index: number) => {
  * @param userId
  */
 const getFriendAndMsg = (userId: number) => {
-  getFriendList(Number(userId)).then(async (res: any) => {
-    friendList.value = res.data
-    console.log(friendList.value)
+  return new Promise((resolve) => {
+    getFriendList(Number(userId)).then(async (res: any) => {
+      friendList.value = res.data
 
-    friendId.value = res.data[currentIndex.value]?.friendId
+      friendId.value = res.data[currentIndex.value]?.friendId
 
-    if (res.data.length == 0) return
+      if (res.data.length == 0) return
 
-    // 获取最新消息
-    getChatMessage(friendList.value).then((res: any) => {
-      const msg = res.data
-      allFriendMessage.value = res.data
-      if (msg.length === 0) return
+      // 获取最新消息
+      await getChatMessage(friendList.value).then((res: any) => {
+        const msg = res.data
+        allFriendMessage.value = res.data
+        if (msg.length === 0) return
 
-      res.data.forEach((item: any, index: number) => {
-        friendList.value[index].newMsg = item[item.length - 1].message
-        friendList.value[index].minutes = item[item.length - 1].sendTime.slice(10, 15)
+        res.data.forEach((item: any, index: number) => {
+          friendList.value[index].newMsg = item[item.length - 1]?.message
+          friendList.value[index].minutes = item[item.length - 1]?.sendTime.slice(10, 15)
+        })
+
+        resolve(friendList.value)
       })
     })
   })
@@ -131,6 +149,7 @@ const getFriendAndMsg = (userId: number) => {
   padding: 20px 10px 10px 18px;
   background-color: #282b38;
   align-items: center;
+  padding-bottom: 30px;
 
   .addFriend {
     display: flex;
@@ -182,6 +201,7 @@ const getFriendAndMsg = (userId: number) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  padding-bottom: 80px;
 
   .user_info {
     display: flex;
@@ -206,6 +226,23 @@ const getFriendAndMsg = (userId: number) => {
           background-color: #23e58a;
           // border: 3px solid #313746;
           border-radius: 50px;
+        }
+
+        .group_avatar {
+          display: flex;
+          flex-wrap: wrap;
+          height: 42px;
+          width: 42px;
+          border-radius: 5px;
+          overflow: hidden;
+          img {
+            width: 20px;
+            height: 20px;
+
+            &:nth-child(n) {
+              margin: 0 1px 1px 0;
+            }
+          }
         }
       }
 

@@ -6,21 +6,23 @@ class FriendService {
    * @param {*} userId
    * @returns
    */
-  async selectFriend(userId) {
+  async selectFriend(userId, state) {
     // const statement = `SELECT * FROM user LEFT JOIN user_friend ON user.id = user_friend.userId  WHERE userId IS NOT NULL AND userId = ? AND state = '0';`
-    const statement = `SELECT u.userName, u1.userName friendName, u.id userId, u1.id friendId, u1.status friend_status, u1.avatar friend_avatar, u1.phone friend_phone, state
+    const statement = `SELECT u.userName, u1.userName friendName, u.id userId, u1.id friendId, u1.status friend_status, u1.avatar friend_avatar, u1.createTime, u1.phone friend_phone, state
 	  FROM user u
 	  LEFT JOIN user_friend fm ON u.id = fm.userId
     LEFT JOIN user u1 ON fm.friendId = u1.id
-	  WHERE userId  IS NOT NULL AND userId = ? AND state = 0;`
+	  WHERE userId  IS NOT NULL AND userId = ? AND state = ?;`
 
-    const [values] = await connection.execute(statement, [userId])
+    const [values] = await connection.execute(statement, [userId, state])
 
     // 通过好友id数组查询所有好友信息
     if (values.length === 0) return []
 
     return values
   }
+
+  async friendApplyList(userId, friendId) {}
 
   /**
    * 添加聊天消息

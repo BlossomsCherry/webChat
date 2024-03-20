@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-const {
+let {
   NAME_OR_PASSWORD_IS_REQUIRED,
   NAME_IS_NOT_EXISTS,
   PASSWORD_IS_ERROR,
@@ -19,21 +19,18 @@ const verifyLogin = async (ctx, next) => {
 
   // 2.判断该用户是否在数据库中是否存在
   let users = await UserService.findUserByName(userName)
+
   const user = users[0]
 
   if (!user) {
-    // return ctx.app.emit('error', NAME_IS_NOT_EXISTS, ctx)
-    return (ctx.body = {
-      msg: '用户不存在！'
-    })
+    NAME_IS_NOT_EXISTS = new Error('用户不存在！')
+    return ctx.app.emit('error', NAME_IS_NOT_EXISTS, ctx)
   }
 
   // 3.查询数据库中的密码和用户传递密码是否一致
   if (user.password !== md5password(password)) {
-    // return ctx.app.emit('error', PASSWORD_IS_ERROR, ctx)
-    return (ctx.body = {
-      msg: '密码错误！'
-    })
+    PASSWORD_IS_ERROR = new Error('密码错误！')
+    return ctx.app.emit('error', PASSWORD_IS_ERROR, ctx)
   }
 
   // 4.修改用户的在线状态
@@ -50,7 +47,9 @@ const verifyLogin = async (ctx, next) => {
 const verifyAuth = async (ctx, next) => {
   // 1.获取token
   const authorization = ctx.headers.authorization
+
   if (!authorization) {
+    UN_AUTHORIZATION = new Error('未授权')
     return ctx.app.emit('error', UN_AUTHORIZATION, ctx)
   }
   const token = authorization.replace('Bearer ', '')
@@ -67,7 +66,8 @@ const verifyAuth = async (ctx, next) => {
     ctx.body = '可以访问接口'
     await next()
   } catch (error) {
-    ctx.app.emit('error', UN_AUTHORIZATION, ctx)
+    UN_AUTHORIZATION = new Error('未授权')
+    return ctx.app.emit('error', UN_AUTHORIZATION, ctx)
   }
 }
 

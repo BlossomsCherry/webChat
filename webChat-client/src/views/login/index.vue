@@ -18,10 +18,21 @@
           class="demo-form-inline"
         >
           <el-form-item prop="userName">
-            <el-input required v-model="ruleForm.userName" placeholder="用户名" />
+            <el-input
+              required
+              v-model="ruleForm.userName"
+              @keyup.enter.native="msgInput"
+              placeholder="用户名"
+            />
           </el-form-item>
           <el-form-item prop="password">
-            <el-input required v-model="ruleForm.password" type="password" placeholder="密码" />
+            <el-input
+              required
+              v-model="ruleForm.password"
+              @keyup.enter.native="msgInput"
+              type="password"
+              placeholder="密码"
+            />
           </el-form-item>
           <el-form-item>
             <el-button type="primary" size="small" @click="loginSubmit(ruleFormRef)"
@@ -154,6 +165,11 @@ const resetForm = () => {
   }
 }
 
+const msgInput = () => {
+  console.log('object')
+  loginSubmit(ruleFormRef.value)
+}
+
 /* 登录 */
 const loginSubmit = (formEl: FormInstance | undefined) => {
   if (!formEl) return
@@ -164,7 +180,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 
       login(ruleForm.value).then((res: any) => {
         if (res.code === 0) {
-          console.log(res)
+          console.log(res.data)
+
           userId.value = res.data.id
           localStorage.setItem('userId', res.data.id)
           localStorage.setItem('user', JSON.stringify(res.data))
@@ -172,7 +189,7 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
           setToken(res.data.token)
           router.replace('/layout')
 
-          socket.emit('login', ruleForm.value.userName)
+          socket.emit('login', res.data)
 
           resetForm()
 
@@ -259,6 +276,7 @@ onMounted(() => {
   width: 100%;
   height: 100vh;
   text-align: center;
+  font-family: Georgia, serif;
   background: linear-gradient(90deg, #fad5d7, #bde0f1);
 
   .container {

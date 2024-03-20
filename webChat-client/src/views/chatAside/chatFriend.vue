@@ -12,6 +12,8 @@
       </div>
     </div>
 
+    <el-divider />
+
     <div class="tabs">
       <div class="fg">
         <div :class="['friend', { active: true }]">好友</div>
@@ -80,8 +82,7 @@ const selectFriend = (index: number) => {
     flex-direction: column;
     align-items: center;
     padding-top: 20px;
-    border-bottom: 1px solid #f5f5f5;
-
+    // border-bottom: 1px solid #dcdfe6;
     .notice {
       display: flex;
       width: 100%;

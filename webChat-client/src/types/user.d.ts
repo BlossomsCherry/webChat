@@ -6,3 +6,8 @@ interface User {
   role?: string
   tag?: string
 }
+
+interface addFriend {
+  userId: number
+  friendId: number
+}
