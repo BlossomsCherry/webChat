@@ -68,6 +68,40 @@ io.on('connection', socket => {
     // 发送心跳响应给客户端
     socket.emit('heartbeat')
   })
+
+  // 监听加入房间事件
+  socket.on('joinRoom', roomId => {
+    socket.join(roomId) // 加入房间
+  })
+
+  socket.on('callRemote', roomId => {
+    // 向房间内所有人进行广播
+    io.to(roomId).emit('callRemote')
+  })
+
+  socket.on('acceptCall', roomId => {
+    io.to(roomId).emit('acceptCall')
+  })
+
+  // 接收offer
+  socket.on('sendOffer', ({ offer, roomId }) => {
+    io.to(roomId).emit('sendOffer', offer)
+  })
+
+  // 接收answer
+  socket.on('sendAnswer', ({ answer, roomId }) => {
+    io.to(roomId).emit('sendAnswer', answer)
+  })
+
+  // 接收candidate
+  socket.on('sendCandidate', ({ candidate, roomId }) => {
+    io.to(roomId).emit('sendCandidate', candidate)
+  })
+
+  // 挂断视频
+  socket.on('hangup', roomId => {
+    io.to(roomId).emit('hangup')
+  })
 })
 
 /* 启动服务器 */

@@ -1,6 +1,6 @@
 <template>
   <div class="search">
-    <el-input
+    <!-- <el-input
       v-model="search"
       size="small"
       placeholder="搜索"
@@ -8,7 +8,18 @@
       :prefix-icon="Search"
       @focus="searchFocus"
       @clear="clearClick"
-    />
+    /> -->
+    <div class="group">
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+        <g>
+          <path
+            d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+          ></path>
+        </g>
+      </svg>
+      <input placeholder="Search" type="search" class="input" />
+    </div>
+
     <div class="addFriend" @click="addFlag = !addFlag">
       <el-icon><Plus /></el-icon>
     </div>
@@ -24,7 +35,7 @@
       <div class="user_info" v-if="searchFlag">
         <template v-if="!!friendList.length">
           <div
-            v-for="(item, index) in chatList"
+            v-for="(item, index) in friendList"
             :key="item"
             :class="['user_item', { active_user_item: index == currentIndex }]"
             @click="selectPerson(index)"
@@ -36,6 +47,7 @@
               </div>
               <div class="avatar_status" v-if="!!item.friend_status"></div>
             </div>
+
             <div class="content">
               <h5>{{ item.friendName || item.groupName }}</h5>
               <span>{{ item.newMsg }}</span>
@@ -50,22 +62,26 @@
 </template>
 
 <script lang="ts" setup>
-import { Search } from '@element-plus/icons-vue'
 import { useCommonStore } from '@/stores/common'
-import { ref, onMounted } from 'vue'
-import { getFriendList, getChatMessage, searchGroup, searchGroupMember } from '@/api'
+import { ref, onMounted, watch } from 'vue'
+import {
+  getFriendList,
+  getChatMessage,
+  searchGroup,
+  searchGroupMember,
+  queryGroupMessage
+} from '@/api'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
 const commonStore = useCommonStore()
-const { showCreateGroup, groupId, groupUserAvatar } = storeToRefs(commonStore)
+const { showCreateGroup, groupId, groupUserAvatar, refresh } = storeToRefs(commonStore)
 const search = ref('')
 const addFlag = ref(false)
 const searchFlag = ref(true)
 const { friendId, friendInfo, currentIndex, friendList, addFG, allFriendMessage } =
   storeToRefs(userStore)
-const chatList = ref<any>([])
 
 onMounted(async () => {
   const userId = localStorage.getItem('userId')
@@ -73,7 +89,7 @@ onMounted(async () => {
   if (userId) {
     await getFriendAndMsg(Number(userId))
     searchGroup(Number(userId)).then((res: any) => {
-      chatList.value = friendList.value.concat(res.data)
+      friendList.value.push(...res.data)
     })
 
     searchGroupMember(groupId.value).then((res: any) => {
@@ -81,6 +97,17 @@ onMounted(async () => {
     })
   }
 })
+
+watch(
+  () => refresh.value,
+  () => {
+    queryGroupMessage(groupId.value).then((res: any) => {
+      allFriendMessage.value.splice(currentIndex.value, 1, res.data)
+      console.log(allFriendMessage.value)
+      refresh.value = false
+    })
+  }
+)
 
 const searchFocus = () => {
   searchFlag.value = false
@@ -108,7 +135,12 @@ const selectPerson = (index: number) => {
 
   friendId.value = friendList.value[index]?.friendId
   groupId.value = friendList.value[index]?.group_id
-  console.log(groupId.value)
+
+  if (groupId.value) {
+    queryGroupMessage(groupId.value).then((res: any) => {
+      allFriendMessage.value.splice(index, 1, res.data)
+    })
+  }
 }
 
 /**
@@ -124,8 +156,14 @@ const getFriendAndMsg = (userId: number) => {
 
       if (res.data.length == 0) return
 
-      // 获取最新消息
-      await getChatMessage(friendList.value).then((res: any) => {
+      // 获取好友最新消息
+      const arrList = friendList.value.map((item): getMessage => {
+        return {
+          userId: item.userId,
+          friendId: item.friendId
+        }
+      })
+      await getChatMessage(arrList).then((res: any) => {
         const msg = res.data
         allFriendMessage.value = res.data
         if (msg.length === 0) return
@@ -147,9 +185,50 @@ const getFriendAndMsg = (userId: number) => {
   position: relative;
   display: flex;
   padding: 20px 10px 10px 18px;
-  background-color: #282b38;
   align-items: center;
   padding-bottom: 30px;
+
+  .group {
+    display: flex;
+    width: 195px;
+    line-height: 25px;
+    align-items: center;
+    position: relative;
+
+    .input {
+      width: 100%;
+      height: 40px;
+      line-height: 28px;
+      padding: 0 1rem;
+      padding-left: 2.5rem;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      outline: none;
+      background-color: #f3f3f4;
+      color: #0d0c22;
+      transition: 0.3s ease;
+    }
+
+    .input::placeholder {
+      color: #9e9ea7;
+    }
+
+    .input:focus,
+    input:hover {
+      outline: none;
+      border-color: rgba(234, 76, 137, 0.4);
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+    }
+
+    .icon {
+      position: absolute;
+      left: 1rem;
+      fill: #9e9ea7;
+      width: 1rem;
+      height: 1rem;
+    }
+  }
 
   .addFriend {
     display: flex;
@@ -157,7 +236,7 @@ const getFriendAndMsg = (userId: number) => {
     height: 25px;
     margin-left: 10px;
     border-radius: 3px;
-    background-color: #2c313f;
+    background-color: #f3f3f4;
     justify-content: center;
     align-items: center;
     cursor: pointer;
@@ -176,12 +255,13 @@ const getFriendAndMsg = (userId: number) => {
   .selectBox {
     position: absolute;
     left: 145px;
-    top: 50px;
+    top: 57px;
     padding: 5px;
     font-size: 14px;
     border-radius: 5px;
-    color: rgba(225, 225, 225, 0.9);
-    background-color: #2c313f;
+    border: 1px solid #ccc;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+    background-color: rgba(255, 255, 255, 0.9);
     z-index: 99;
 
     .item {
@@ -193,7 +273,7 @@ const getFriendAndMsg = (userId: number) => {
       margin-bottom: 6px;
     }
     .item:hover {
-      background-color: rgba(225, 225, 225, 0.2);
+      background-color: rgba(0, 0, 0, 0.1);
     }
   }
 }
@@ -201,7 +281,7 @@ const getFriendAndMsg = (userId: number) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
-  padding-bottom: 80px;
+  padding-bottom: 85px;
 
   .user_info {
     display: flex;
@@ -209,10 +289,10 @@ const getFriendAndMsg = (userId: number) => {
     .user_item {
       display: flex;
       padding: 10px;
-      margin: 15px 18px;
+      margin: 8px 18px;
       border-radius: 8px;
-      background-color: #313746;
-      color: #fff;
+      background-color: #f2f2f2;
+      color: #000;
       cursor: pointer;
 
       .avatar {
@@ -224,7 +304,6 @@ const getFriendAndMsg = (userId: number) => {
           width: 10px;
           height: 10px;
           background-color: #23e58a;
-          // border: 3px solid #313746;
           border-radius: 50px;
         }
 
@@ -267,11 +346,11 @@ const getFriendAndMsg = (userId: number) => {
           width: 40px;
           height: 20px;
           font-size: 12px;
-          color: #fff;
         }
       }
     }
     .active_user_item {
+      color: #fff !important;
       background-color: #118bfa;
       box-shadow: 2px 3px 8px rgba(18, 139, 250, 0.6);
     }

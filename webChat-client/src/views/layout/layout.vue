@@ -1,5 +1,5 @@
 <template>
-  <div class="chat_layout">
+  <div class="chat_layout bg-slate-200">
     <div class="wrapper-app">
       <el-container>
         <el-aside width="200px">
@@ -50,7 +50,7 @@ const { friendList, allFriendMessage } = storeToRefs(userStore)
 
 onUnmounted(() => {
   // 组件销毁后，刷新页面
-  window.location.reload()
+  // window.location.reload()
 
   allFriendMessage.value = []
 })
@@ -70,6 +70,7 @@ onMounted(() => {
 
 /* 好友上线通知 */
 socket.on('message', (userInfo: any) => {
+  return
   getFriendList(userId).then((res: any) => {
     friendList.value = res.data
 
@@ -83,6 +84,7 @@ socket.on('message', (userInfo: any) => {
 
 /* 好友下线通知 */
 socket.on('friendLeave', (userInfo: any) => {
+  return
   getFriendList(userId).then((res: any) => {
     friendList.value = res.data
 
@@ -111,11 +113,17 @@ socket.on('friendApply', (name: any) => {
 :deep(.el-icon) {
   color: #74798a;
 }
+
+:deep(.el-container) {
+  padding-left: 0 !important;
+}
+
 .chat_layout {
   position: relative;
   width: 100%;
   height: 100vh;
-  background-color: #979da7;
+
+  // background-color: #979da7;
 
   .wrapper-app {
     position: absolute;
@@ -128,7 +136,7 @@ socket.on('friendApply', (name: any) => {
     transform: translate(-50%, -50%);
     border-radius: 10px;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
-    background-color: #282b38;
+    background-color: #f2f2f2;
 
     overflow: hidden;
 

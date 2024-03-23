@@ -10,6 +10,7 @@ declare module 'vue' {
     Container: typeof import('./src/components/Container.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
+    ElBu: typeof import('element-plus/es')['ElBu']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElCheck: typeof import('element-plus/es')['ElCheck']
     ElCheckbox: typeof import('element-plus/es')['ElCheckbox']

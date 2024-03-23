@@ -50,3 +50,29 @@ export function searchGroupMember(id: number) {
     }
   })
 }
+
+/**
+ * 发送群消息
+ * @param data
+ * @returns
+ */
+export function sendGroupMessage(data: any) {
+  return WRequest.post({
+    url: '/group/sendGroupMessage',
+    data
+  })
+}
+
+/**
+ * 查询群消息
+ * @param groupId
+ * @returns
+ */
+export function queryGroupMessage(groupId: number) {
+  return WRequest.post({
+    url: '/group/queryGroupMessage',
+    data: {
+      groupId
+    }
+  })
+}

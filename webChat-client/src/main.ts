@@ -1,10 +1,24 @@
 import './assets/main.css'
+// import './css/tailwindcss.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 import chatUI from './components/index'
 import socket from './utils/socket'
+
+import App from './App.vue'
+import router from './router'
+
+const app = createApp(App)
+
+app.use(createPinia())
+app.use(router)
+app.use(chatUI)
+
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
 
 socket.io.on('reconnect_failed', () => {
   console.log('webSocket连接失败')
@@ -30,18 +44,5 @@ socket.on('disconnect', () => {
   console.log('与服务器断开连接')
   clearInterval(heartbeatInterval) // 停止发送心跳消息
 })
-
-import App from './App.vue'
-import router from './router'
-
-const app = createApp(App)
-
-app.use(createPinia())
-app.use(router)
-app.use(chatUI)
-
-for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
-  app.component(key, component)
-}
 
 app.mount('#app')

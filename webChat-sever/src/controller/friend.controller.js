@@ -10,10 +10,17 @@ class FriendController {
     const state = 0
     const result = await FriendService.selectFriend(userId, state)
 
+    const arr = []
+    const newRes = Array.from(new Set(result.map(item => item.friendId)))
+    newRes.forEach(item => {
+      const index = result.findIndex(element => element.friendId === item)
+      arr.push(result[index])
+    })
+
     ctx.body = {
       code: 200,
       msg: '获取好友列表成功',
-      data: result
+      data: arr
     }
   }
 

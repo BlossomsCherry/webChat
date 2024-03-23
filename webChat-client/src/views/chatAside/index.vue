@@ -18,12 +18,11 @@ import chatTool from './chatTool.vue'
   flex: 1;
   display: flex;
   overflow: hidden;
-  background-color: #282b38;
+  background-color: #fff;
 
   .tool {
     flex: 1;
-    // margin-left: 1px;
-    background-color: #282b38;
+    background-color: rgba(206, 206, 206, 0.8);
     border-top-left-radius: 10px;
     border-bottom-left-radius: 10px;
   }

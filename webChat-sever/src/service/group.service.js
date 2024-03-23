@@ -51,6 +51,32 @@ class groupService {
 
     return result
   }
+
+  // 发送群消息
+  async sendGroupMessage(groupId, senderId, message, type) {
+    const statement = `INSERT INTO group_message (groupId, senderId, message, type) VALUES ( ?, ?, ?, ?);`
+
+    const [result] = await connection.execute(statement, [
+      groupId,
+      senderId,
+      message,
+      type
+    ])
+
+    return result
+  }
+
+  // 查询群消息
+  async queryGroupMessage(groupId) {
+    const statement = `SELECT gm.groupId, gm.senderId userId, gm.message, gm.sentTime, gm.type, u.userName, u.avatar userAvatar 
+	FROM group_message gm
+	left join \`user\` u on gm.senderId = u.id
+	WHERE groupId = ?`
+
+    const [result] = await connection.execute(statement, [groupId])
+
+    return result
+  }
 }
 
 module.exports = new groupService()

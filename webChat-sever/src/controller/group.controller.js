@@ -51,6 +51,42 @@ class GroupController {
       data: result
     }
   }
+
+  // 发送群消息
+  async sendGroupMessage(ctx, next) {
+    const { groupId, senderId, message, type } = ctx.request.body
+
+    const result = await groupService.sendGroupMessage(
+      groupId,
+      senderId,
+      message,
+      type
+    )
+
+    ctx.body = {
+      code: 200,
+      msg: '消息发送成功',
+      data: result
+    }
+  }
+
+  // 查询群消息
+  async queryGroupMessage(ctx, next) {
+    const { groupId } = ctx.request.body
+
+    const result = await groupService.queryGroupMessage(groupId)
+
+    // 处理时间格式
+    result.forEach(item => {
+      item.sendTime = item.sentTime.toLocaleString()
+    })
+
+    ctx.body = {
+      code: 200,
+      msg: '查询成功',
+      data: result
+    }
+  }
 }
 
 module.exports = new GroupController()

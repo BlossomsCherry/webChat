@@ -32,6 +32,11 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/views/chatAside/chatFriend.vue')
       }
     ]
+  },
+  {
+    path: '/test',
+    name: 'test',
+    component: () => import('@/views/layout/test.vue')
   }
 ]
 

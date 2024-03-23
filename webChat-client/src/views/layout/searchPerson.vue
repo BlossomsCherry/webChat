@@ -2,14 +2,35 @@
   <div class="searchPerson" v-if="!!addFG">
     <div class="title">
       <span>搜索</span>
-      <el-icon @click="addFG = 0"><Close /></el-icon>
+      <svg
+        @click="addFG = 0"
+        height="20"
+        viewBox="0 0 20 20"
+        width="20"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        <path
+          d="m15.8333 5.34166-1.175-1.175-4.6583 4.65834-4.65833-4.65834-1.175 1.175 4.65833 4.65834-4.65833 4.6583 1.175 1.175 4.65833-4.6583 4.6583 4.6583 1.175-1.175-4.6583-4.6583z"
+          fill="#fff"
+        ></path>
+      </svg>
     </div>
-    <el-input placeholder="输入搜索关键词" :prefix-icon="Search" @input="searchInput"></el-input>
+
+    <div class="group">
+      <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
+        <g>
+          <path
+            d="M21.53 20.47l-3.66-3.66C19.195 15.24 20 13.214 20 11c0-4.97-4.03-9-9-9s-9 4.03-9 9 4.03 9 9 9c2.215 0 4.24-.804 5.808-2.13l3.66 3.66c.147.146.34.22.53.22s.385-.073.53-.22c.295-.293.295-.767.002-1.06zM3.5 11c0-4.135 3.365-7.5 7.5-7.5s7.5 3.365 7.5 7.5-3.365 7.5-7.5 7.5-7.5-3.365-7.5-7.5z"
+          ></path>
+        </g>
+      </svg>
+      <input placeholder="Search" type="search" class="input" />
+    </div>
 
     <el-scrollbar>
       <div class="content">
         <template v-for="(item, index) in personList" :key="index">
-          <userBox :item="item" @click-btn="btnClick(item)"></userBox>
+          <userBox :item="item" :backgroundColor="'#fff'" @click-btn="btnClick(item)"></userBox>
         </template>
       </div>
     </el-scrollbar>
@@ -17,7 +38,6 @@
 </template>
 
 <script setup lang="ts">
-import { Search } from '@element-plus/icons-vue'
 import { ElNotification } from 'element-plus'
 import 'element-plus/theme-chalk/el-message.css'
 import userBox from '@/components/userBox.vue'
@@ -36,7 +56,6 @@ const personList = ref<Person[]>([])
 onMounted(() => {
   searchAllPerson().then((res: any) => {
     personList.value = res.data
-    console.log(personList.value)
   })
 })
 
@@ -76,27 +95,66 @@ const btnClick = (item: Person) => {
   width: 500px;
   height: 80%;
   border-radius: 5px;
-  background-color: #fff;
+  background: linear-gradient(to right, #2dd4bf, #22d3ee);
   overflow: hidden;
-
-  :deep(.el-icon) {
-    position: absolute;
-    right: 10px;
-    font-size: 18px;
-    color: #dcdfe6;
-    cursor: pointer;
-  }
 
   .title {
     margin-bottom: 10px;
     text-align: center;
     color: #fff;
+
+    svg {
+      position: absolute;
+      right: 20px;
+      top: 10px;
+      cursor: pointer;
+    }
+  }
+
+  .group {
+    display: flex;
+    line-height: 28px;
+    align-items: center;
+    position: relative;
+    margin-bottom: 20px;
+
+    .input {
+      width: 100%;
+      height: 40px;
+      line-height: 28px;
+      padding: 0 1rem;
+      padding-left: 2.5rem;
+      border: 2px solid transparent;
+      border-radius: 8px;
+      outline: none;
+      background-color: #f3f3f4;
+      color: #0d0c22;
+      transition: 0.3s ease;
+    }
+
+    .input::placeholder {
+      color: #9e9ea7;
+    }
+
+    .input:focus,
+    input:hover {
+      outline: none;
+      border-color: rgba(234, 76, 137, 0.4);
+      background-color: #fff;
+      box-shadow: 0 0 0 4px rgb(234 76 137 / 10%);
+    }
+
+    .icon {
+      position: absolute;
+      left: 1rem;
+      fill: #9e9ea7;
+      width: 1rem;
+      height: 1rem;
+    }
   }
 
   .content {
-    margin-top: 20px;
-    padding-bottom: 50px;
-    border-top: 1px solid #dcdfe6;
+    padding-bottom: 100px;
   }
 }
 </style>

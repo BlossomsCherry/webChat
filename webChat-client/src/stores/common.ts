@@ -11,6 +11,7 @@ export const useCommonStore = defineStore('common', {
     showCreateGroup: boolean
     currentIndex: number
     groupUserAvatar: any[]
+    refresh: boolean
   } => ({
     tabsIndex: 0, //左侧导航栏切换
     friendList: [], //好友列表
@@ -20,7 +21,8 @@ export const useCommonStore = defineStore('common', {
     showInfo: false,
     showCreateGroup: false,
     currentIndex: Number(localStorage.getItem('currentIndex')) || 0,
-    groupUserAvatar: []
+    groupUserAvatar: [],
+    refresh: false
   }),
   actions: {}
 })
