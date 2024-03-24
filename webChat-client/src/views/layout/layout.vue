@@ -40,6 +40,7 @@ import { useUserStore } from '@/stores/user'
 import { useCommonStore } from '@/stores/common'
 import { storeToRefs } from 'pinia'
 import socket from '@/utils/socket'
+import Cookies from 'js-cookie'
 
 const userStore = useUserStore()
 const commonStore = useCommonStore()
@@ -57,13 +58,12 @@ onUnmounted(() => {
 
 onMounted(() => {
   const user = JSON.parse(localStorage.getItem('user')!)
-  console.log(user, socket.id)
+  console.log(user)
 
   socketId.value = socket.id!
   socket.emit('refresh', user.userName, socketId.value)
 
   friendApplyList(userId).then((res: any) => {
-    console.log(res)
     friend_applyList.value = res.data
   })
 })
@@ -122,8 +122,7 @@ socket.on('friendApply', (name: any) => {
   position: relative;
   width: 100%;
   height: 100vh;
-
-  // background-color: #979da7;
+  user-select: none; /* 禁止文本选择以优化拖拽体验 */
 
   .wrapper-app {
     position: absolute;

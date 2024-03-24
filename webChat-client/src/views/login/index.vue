@@ -100,6 +100,7 @@ import { useLoginStore } from '@/stores/login'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import socket from '@/utils/socket'
+import Cookies from 'js-cookie'
 
 const ruleFormRef = ref<FormInstance>()
 const router = useRouter()
@@ -180,11 +181,12 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
 
       login(ruleForm.value).then((res: any) => {
         if (res.code === 0) {
-          console.log(res.data)
-
           userId.value = res.data.id
           localStorage.setItem('userId', res.data.id)
           localStorage.setItem('user', JSON.stringify(res.data))
+
+          Cookies.set('userId', res.data.id)
+          Cookies.set('user', JSON.stringify(res.data))
 
           setToken(res.data.token)
           router.replace('/layout')

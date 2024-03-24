@@ -1,5 +1,4 @@
 import './assets/main.css'
-// import './css/tailwindcss.css'
 
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
@@ -26,8 +25,8 @@ socket.io.on('reconnect_failed', () => {
 
 // 监听与服务器的连接状态
 socket.on('connect', () => {
-  localStorage.setItem('userSocketId', socket.id!)
-  console.log('与服务器连接成功', socket.id)
+  // localStorage.setItem('userSocketId', socket.id!)
+  console.log('与服务器连接成功')
 })
 
 // 定时发送心跳消息

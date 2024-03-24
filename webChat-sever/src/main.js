@@ -69,6 +69,11 @@ io.on('connection', socket => {
     socket.emit('heartbeat')
   })
 
+  // 弹出视频通话
+  socket.on('showVideo', friendId => {
+    socket.broadcast.emit('showVideo', friendId)
+  })
+
   // 监听加入房间事件
   socket.on('joinRoom', roomId => {
     socket.join(roomId) // 加入房间

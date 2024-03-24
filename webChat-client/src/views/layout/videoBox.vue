@@ -37,7 +37,7 @@ onMounted(() => {
   })
 
   sock.on('connect', () => {
-    console.log('连接成功~')
+    // console.log('连接成功~')
 
     // 向服务器发送加入房间事件
     sock.emit('joinRoom', roomId)
@@ -49,10 +49,11 @@ onMounted(() => {
       called.value = true // 接听方
       calling.value = true
 
-      console.log('收到视频邀请')
+      // console.log('收到视频邀请')
     }
   })
 
+  // 接通视频
   sock.on('acceptCall', async () => {
     if (caller.value) {
       // 用户A收到用户B同意视频请求
@@ -70,7 +71,7 @@ onMounted(() => {
 
       // 监听onaddStream事件来获取对方音视频流
       peer.value.onaddstream = (event: any) => {
-        console.log('用户A收到用户B的stream', event)
+        // console.log('用户A收到用户B的stream', event)
 
         calling.value = false
         communication.value = true
@@ -85,7 +86,7 @@ onMounted(() => {
         offerToReceiveVideo: 1
       })
 
-      console.log(offer)
+      // console.log(offer)
 
       // 在本地设置offer信息
       await peer.value.setLocalDescription(offer)
@@ -99,7 +100,7 @@ onMounted(() => {
   sock.on('sendOffer', async (offer) => {
     // 当前是接收端的时候进行下一步处理
     if (called.value) {
-      console.log('收到offer', offer)
+      // console.log('收到offer', offer)
       // 创建自己的RTCPeerConnection
       peer.value = new RTCPeerConnection()
 
@@ -117,7 +118,7 @@ onMounted(() => {
 
       // 监听onaddStream事件来获取对方音视频流
       peer.value.onaddstream = (event: any) => {
-        console.log('用户B收到用户A的stream', event)
+        // console.log('用户B收到用户A的stream', event)
 
         calling.value = false
         communication.value = true
@@ -131,7 +132,7 @@ onMounted(() => {
 
       // 生成answer
       const answer = await peer.value.createAnswer()
-      console.log('用户B生成answer', answer)
+      // console.log('用户B生成answer', answer)
 
       // 在本地设置answer信息
       await peer.value.setLocalDescription(answer)
@@ -144,14 +145,14 @@ onMounted(() => {
   // 收到answer
   sock.on('sendAnswer', async (answer) => {
     if (caller.value) {
-      console.log('用户A收到answer', answer)
+      // console.log('用户A收到answer', answer)
       await peer.value.setRemoteDescription(answer)
     }
   })
 
   // 收到candidate
   sock.on('sendCandidate', (candidate) => {
-    console.log('收到candidate', candidate)
+    // console.log('收到candidate', candidate)
     peer.value.addIceCandidate(candidate)
   })
 
@@ -180,7 +181,7 @@ const getLocalStream = async () => {
 
 /* 发起发发起视频请求 */
 const callRemote = async () => {
-  console.log('发起视频')
+  // console.log('发起视频')
   // 用户A像用户B发起视频请求
   caller.value = true // 表示当前用户是发起方
   calling.value = true // 表示当前正在呼叫
@@ -193,7 +194,7 @@ const callRemote = async () => {
 
 /* 接受视频请求 */
 const acceptCall = async () => {
-  console.log('同意视频邀请')
+  // console.log('同意视频邀请')
 
   socketZero.value?.emit('acceptCall', roomId)
   getLocalStream()
@@ -203,8 +204,6 @@ const acceptCall = async () => {
 let isHangupFlag = false
 const hangupCall = async () => {
   if (isHangupFlag) return
-
-  console.log('视频已挂断')
 
   if (peer.value) {
     // 使用getSenders方法停止所有轨道（tracks）
@@ -238,28 +237,51 @@ const hangupCall = async () => {
   caller.value = false
   communication.value = false
 
-  isHangupFlag = true
-  showVideo.value = false
-
   // 通知对方挂断
   socketZero.value?.emit('hangup', roomId)
+
+  isHangupFlag = true
+  showVideo.value = false
 }
 
 defineExpose({ callRemote })
 </script>
 
 <template>
-  <div class="video_container">
-    <div class="w-80 h-4/5 rounded-2xl absolute left-1/2 top-5 -translate-x-1/2 bg-gray-200">
-      <video ref="localVideo" class="w-96 h-full bg-gray-200 mb-4 object-cover"></video>
-      <video ref="remoteVideo" class="w-32 h-48 absolute top-0 right-0 object-cover"></video>
+  <div class="video_container draggable">
+    <div class="w-80 h-4/5 rounded-2xl absolute left-1/2 top-5 -translate-x-1/2">
+      <video ref="localVideo" class="w-96 h-full mb-4 object-cover bg-[#212121] rounded-xl"></video>
+      <video
+        ref="remoteVideo"
+        class="w-32 h-48 absolute top-0 right-0 bg-[#212121] object-cover rounded-tr-xl"
+      ></video>
 
-      <span v-if="!communication" class="absolute left-1/2 -translate-x-1/2 text-white bottom-28">{{
-        caller ? '等待接听中...' : '收到视频邀请'
-      }}</span>
-      <span v-else class="absolute left-1/2 -translate-x-1/2 text-white bottom-28">
-        正在通话中</span
+      <div
+        v-if="!communication"
+        class="absolute flex left-1/2 -translate-x-1/2 text-white bottom-28"
       >
+        <span v-if="caller"> 等待接听中 </span>
+        <span v-if="called"> 收到视频邀请 </span>
+
+        <div v-if="calling && caller" class="loader ml-2">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </div>
+
+      <div v-else class="absolute left-1/2 -translate-x-1/2 text-white bottom-28">正在通话中</div>
+
+      <div
+        v-if="called && !communication"
+        class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2"
+      >
+        <div class="loader">
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </div>
+      </div>
 
       <div class="phone flex w-40 justify-center absolute left-1/2 -translate-x-1/2 bottom-10">
         <button class="button1 mr-6" v-if="called && !communication" @click="acceptCall">
@@ -314,8 +336,8 @@ defineExpose({ callRemote })
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 100%;
     border: none;
     background-color: #e8584b;
@@ -329,8 +351,8 @@ defineExpose({ callRemote })
     display: flex;
     justify-content: center;
     align-items: center;
-    width: 60px;
-    height: 60px;
+    width: 50px;
+    height: 50px;
     border-radius: 100%;
     border: none;
     background-color: #30c04f;
@@ -338,6 +360,41 @@ defineExpose({ callRemote })
 
   .button1::after {
     background-color: #2bac47;
+  }
+}
+
+.loader {
+  display: flex;
+  align-items: center;
+}
+
+.bar {
+  display: inline-block;
+  width: 3px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.5);
+  border-radius: 10px;
+  animation: scale-up4 1s linear infinite;
+}
+
+.bar:nth-child(2) {
+  height: 20px;
+  margin: 0 5px;
+  animation-delay: 0.25s;
+}
+
+.bar:nth-child(3) {
+  animation-delay: 0.5s;
+}
+
+@keyframes scale-up4 {
+  20% {
+    background-color: #ffff;
+    transform: scaleY(1.5);
+  }
+
+  40% {
+    transform: scaleY(1);
   }
 }
 </style>

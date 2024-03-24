@@ -260,16 +260,26 @@ const scrollToBottom = () => {
 /**
  * 工具栏点击
  */
-const videoRef = ref<an>(null)
+const videoRef = ref<any>(null)
 const showVideo = ref<boolean>(false)
-const toolClick = (index) => {
+const toolClick = (index: number) => {
+  console.log(friendId.value)
   if (index === 0) {
+    socket.emit('showVideo', friendId.value)
+
     showVideo.value = true
     setTimeout(() => {
       videoRef.value.callRemote()
     }, 500)
   }
 }
+
+// 监听是否弹出视频通话
+socket.on('showVideo', (friendId1) => {
+  // if (friendId1 === userId) {
+  showVideo.value = true
+  // }
+})
 </script>
 
 <style lang="scss" scoped>
