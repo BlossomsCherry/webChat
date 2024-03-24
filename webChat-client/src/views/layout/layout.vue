@@ -46,7 +46,7 @@ const userStore = useUserStore()
 const commonStore = useCommonStore()
 const { tabsIndex, socketId, friend_applyList, showInfo, showCreateGroup } =
   storeToRefs(commonStore)
-const userId = Number(localStorage.getItem('userId'))
+const userId = Number(sessionStorage.getItem('userId'))
 const { friendList, allFriendMessage } = storeToRefs(userStore)
 
 onUnmounted(() => {
@@ -57,7 +57,7 @@ onUnmounted(() => {
 })
 
 onMounted(() => {
-  const user = JSON.parse(localStorage.getItem('user')!)
+  const user = JSON.parse(sessionStorage.getItem('user')!)
   console.log(user)
 
   socketId.value = socket.id!

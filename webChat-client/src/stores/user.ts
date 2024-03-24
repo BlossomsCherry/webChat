@@ -10,13 +10,13 @@ export const useUserStore = defineStore('user', {
     allFriendMessage: any[]
     currentIndex: number
   } => ({
-    userId: localStorage.getItem('userId') ? Number(localStorage.getItem('userId')) : 0,
+    userId: sessionStorage.getItem('userId') ? Number(sessionStorage.getItem('userId')) : 0,
     friendInfo: [],
     friendId: -1,
     friendList: [],
     addFG: 0,
     allFriendMessage: [],
-    currentIndex: Number(localStorage.getItem('currentIndex')) || 0
+    currentIndex: Number(sessionStorage.getItem('currentIndex')) || 0
   }),
   actions: {}
 })

@@ -110,7 +110,7 @@ const router = useRouter()
 const sliderRef = ref<HTMLDivElement | null>(null)
 const isCollapse = ref(true)
 const user: any = computed(() => {
-  return JSON.parse(localStorage.getItem('user')!)
+  return JSON.parse(sessionStorage.getItem('user')!)
 })
 const iconList = ref([
   { name: 'icon-message-dots', path: '/chat' },
@@ -180,9 +180,9 @@ const logout = () => {
   // 断开socket连接
   socket.disconnect()
 
-  localStorage.removeItem('user')
-  localStorage.removeItem('currentIndex')
-  localStorage.removeItem('userId')
+  sessionStorage.removeItem('user')
+  sessionStorage.removeItem('currentIndex')
+  sessionStorage.removeItem('userId')
   router.replace('./login')
 }
 </script>

@@ -20,7 +20,7 @@ export const useCommonStore = defineStore('common', {
     groupId: 0,
     showInfo: false,
     showCreateGroup: false,
-    currentIndex: Number(localStorage.getItem('currentIndex')) || 0,
+    currentIndex: Number(sessionStorage.getItem('currentIndex')) || 0,
     groupUserAvatar: [],
     refresh: false
   }),

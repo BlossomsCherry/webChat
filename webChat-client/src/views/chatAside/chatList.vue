@@ -1,14 +1,5 @@
 <template>
   <div class="search">
-    <!-- <el-input
-      v-model="search"
-      size="small"
-      placeholder="搜索"
-      :clearable="true"
-      :prefix-icon="Search"
-      @focus="searchFocus"
-      @clear="clearClick"
-    /> -->
     <div class="group">
       <svg class="icon" aria-hidden="true" viewBox="0 0 24 24">
         <g>
@@ -77,14 +68,13 @@ import { storeToRefs } from 'pinia'
 const userStore = useUserStore()
 const commonStore = useCommonStore()
 const { showCreateGroup, groupId, groupUserAvatar, refresh } = storeToRefs(commonStore)
-const search = ref('')
 const addFlag = ref(false)
 const searchFlag = ref(true)
 const { friendId, friendInfo, currentIndex, friendList, addFG, allFriendMessage } =
   storeToRefs(userStore)
 
 onMounted(async () => {
-  const userId = localStorage.getItem('userId')
+  const userId = sessionStorage.getItem('userId')
 
   if (userId) {
     await getFriendAndMsg(Number(userId))
@@ -109,14 +99,6 @@ watch(
   }
 )
 
-const searchFocus = () => {
-  searchFlag.value = false
-}
-
-const clearClick = () => {
-  searchFlag.value = true
-}
-
 /* 添加好友/群 */
 const addClick = () => {
   addFG.value = 1
@@ -129,7 +111,7 @@ const addClick = () => {
  */
 const selectPerson = (index: number) => {
   currentIndex.value = index
-  localStorage.setItem('currentIndex', currentIndex.value.toString())
+  sessionStorage.setItem('currentIndex', currentIndex.value.toString())
 
   friendInfo.value = friendList.value[index]
 

@@ -66,12 +66,12 @@ const searchInput = () => {}
  * @param item
  */
 const btnClick = (item: Person) => {
-  const userId = localStorage.getItem('userId')
-  const socketId = localStorage.getItem('userSocketId')
+  const userId = sessionStorage.getItem('userId')
+  const socketId = sessionStorage.getItem('userSocketId')
 
   addFriend({ userId: Number(userId), friendId: item.id }).then((res: any) => {
     if (res.code === 200) {
-      const userName: string = JSON.parse(localStorage.getItem('user')!).userName
+      const userName: string = JSON.parse(sessionStorage.getItem('user')!).userName
 
       socket.emit('addFriend', { socketId, userName, friendName: item.userName })
 

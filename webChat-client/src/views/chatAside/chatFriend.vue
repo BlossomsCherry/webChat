@@ -108,16 +108,16 @@ const categories = ref({
 })
 
 onMounted(() => {
-  const userId = localStorage.getItem('userId')
+  const userId = sessionStorage.getItem('userId')
 
   getFriendList(Number(userId)).then((res: any) => {
     categories.value.Friend = res.data
   })
 })
 
-const currentIndex = ref(Number(localStorage.getItem('friendIndex')) || -1)
+const currentIndex = ref(Number(sessionStorage.getItem('friendIndex')) || -1)
 const selectFriend = (index: number) => {
-  localStorage.setItem('friendIndex', index.toString())
+  sessionStorage.setItem('friendIndex', index.toString())
   currentIndex.value = index
 }
 </script>

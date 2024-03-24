@@ -182,8 +182,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
       login(ruleForm.value).then((res: any) => {
         if (res.code === 0) {
           userId.value = res.data.id
-          localStorage.setItem('userId', res.data.id)
-          localStorage.setItem('user', JSON.stringify(res.data))
+          sessionStorage.setItem('userId', res.data.id)
+          sessionStorage.setItem('user', JSON.stringify(res.data))
 
           Cookies.set('userId', res.data.id)
           Cookies.set('user', JSON.stringify(res.data))

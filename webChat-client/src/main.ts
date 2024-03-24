@@ -25,7 +25,7 @@ socket.io.on('reconnect_failed', () => {
 
 // 监听与服务器的连接状态
 socket.on('connect', () => {
-  // localStorage.setItem('userSocketId', socket.id!)
+  sessionStorage.setItem('userSocketId', socket.id!)
   console.log('与服务器连接成功')
 })
 
