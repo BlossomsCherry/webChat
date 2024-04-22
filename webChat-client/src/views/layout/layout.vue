@@ -35,19 +35,18 @@ import 'element-plus/theme-chalk/el-notification.css'
 
 import { onUnmounted, onMounted } from 'vue'
 import chatAside from '../chatAside/index.vue'
-import { getFriendList, friendApplyList } from '@/api'
+import { friendApplyList } from '@/api'
 import { useUserStore } from '@/stores/user'
 import { useCommonStore } from '@/stores/common'
 import { storeToRefs } from 'pinia'
-import socket from '@/utils/socket'
-import Cookies from 'js-cookie'
+import { io } from 'socket.io-client'
 
 const userStore = useUserStore()
 const commonStore = useCommonStore()
 const { tabsIndex, socketId, friend_applyList, showInfo, showCreateGroup } =
   storeToRefs(commonStore)
 const userId = Number(sessionStorage.getItem('userId'))
-const { friendList, allFriendMessage } = storeToRefs(userStore)
+const { allFriendMessage } = storeToRefs(userStore)
 
 onUnmounted(() => {
   // 组件销毁后，刷新页面
@@ -57,59 +56,56 @@ onUnmounted(() => {
 })
 
 onMounted(() => {
+  const socket = io('http://localhost:3000', {
+    transports: ['websocket'], // 指定传输方式，如WebSocket
+    autoConnect: true, // 是否自动连接
+    reconnection: true, // 是否自动重新连接
+    reconnectionAttempts: 3, // 重新连接尝试次数
+    reconnectionDelay: 1000 // 重新连接延迟时间（毫秒）
+  })
+
   const user = JSON.parse(sessionStorage.getItem('user')!)
-  console.log(user)
+  socket.emit('login', user)
+
+  /* 好友上线通知 */
+  socket.on('friendOnline', ({ friendID, friendName }) => {
+    if (friendID === userId) return
+
+    ElNotification({
+      message: friendName + '上线了',
+      type: 'success',
+      duration: 2500
+    })
+  })
+
+  /* 好友下线通知 */
+  socket.on('friendLeave', ({ userName, id }) => {
+    if (id === userId) return
+
+    ElNotification({
+      message: userName + '下线了',
+      type: 'error',
+      duration: 2500
+    })
+  })
+
+  socket.on('friendApply', (name: any) => {
+    ElNotification({
+      message: name + '发来一条好友申请',
+      type: 'success',
+      duration: 2500
+    })
+  })
 
   socketId.value = socket.id!
-  socket.emit('refresh', user.userName, socketId.value)
 
   friendApplyList(userId).then((res: any) => {
     friend_applyList.value = res.data
   })
 })
-
-/* 好友上线通知 */
-socket.on('message', (userInfo: any) => {
-  return
-  getFriendList(userId).then((res: any) => {
-    friendList.value = res.data
-
-    ElNotification({
-      message: userInfo.userName + '上线了',
-      type: 'success',
-      duration: 2500
-    })
-  })
-})
-
-/* 好友下线通知 */
-socket.on('friendLeave', (userInfo: any) => {
-  return
-  getFriendList(userId).then((res: any) => {
-    friendList.value = res.data
-
-    ElNotification({
-      message: userInfo.userName + '下线了',
-      type: 'error',
-      duration: 2500
-    })
-  })
-})
-
-socket.on('friendApply', (name: any) => {
-  ElNotification({
-    message: name + '发来一条好友申请',
-    type: 'success',
-    duration: 2500
-  })
-})
 </script>
 
 <style lang="scss" scoped>
-:deep(.el-avatar--circle) {
-  border: 2px solid #fff;
-  filter: drop-shadow(0px 0px 5px #409eff);
-}
 :deep(.el-icon) {
   color: #74798a;
 }

@@ -1,7 +1,7 @@
 <template>
   <el-container>
     <el-header>
-      <h2 class="text-black/85 font-bold">好友通知</h2>
+      <h2 class="text-black/85 font-bold">好友申请</h2>
     </el-header>
     <el-main>
       <template v-for="(item, index) in friend_applyList" :key="index">

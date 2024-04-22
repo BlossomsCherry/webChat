@@ -5,6 +5,12 @@ import { io, Socket } from 'socket.io-client'
 const props = defineProps({
   modelValue: {
     type: Boolean
+  },
+  userName: {
+    type: String
+  },
+  avatar: {
+    type: String
   }
 })
 
@@ -37,8 +43,6 @@ onMounted(() => {
   })
 
   sock.on('connect', () => {
-    // console.log('连接成功~')
-
     // 向服务器发送加入房间事件
     sock.emit('joinRoom', roomId)
   })
@@ -48,8 +52,6 @@ onMounted(() => {
     if (!caller.value) {
       called.value = true // 接听方
       calling.value = true
-
-      // console.log('收到视频邀请')
     }
   })
 
@@ -250,11 +252,22 @@ defineExpose({ callRemote })
 <template>
   <div class="video_container draggable">
     <div class="w-80 h-4/5 rounded-2xl absolute left-1/2 top-5 -translate-x-1/2">
-      <video ref="localVideo" class="w-96 h-full mb-4 object-cover bg-[#212121] rounded-xl"></video>
+      <video ref="localVideo" class="w-96 h-full mb-4 object-cover bg-[#212121] rounded-md"></video>
       <video
+        v-show="communication"
         ref="remoteVideo"
-        class="w-32 h-48 absolute top-0 right-0 bg-[#212121] object-cover rounded-tr-xl"
+        class="w-28 h-40 absolute top-4 right-4 bg-[#212121] object-cover"
       ></video>
+
+      <div v-if="!communication && called">
+        <el-avatar
+          class="w-20 h-20 overflow-hidden absolute top-16 left-1/2 -translate-x-1/2 bg-black rounded-full"
+          size="large"
+          :src="avatar"
+        />
+
+        <span class="text-white absolute top-40 left-1/2 -translate-x-1/2">{{ userName }}</span>
+      </div>
 
       <div
         v-if="!communication"

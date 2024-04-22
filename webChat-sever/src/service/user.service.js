@@ -14,7 +14,6 @@ class UserService {
     const statement = `INSERT INTO user (userName, password) VALUES (?, ?);`
     // const [res] = connection.execute('select * from user')
 
-    // console.log(res)
     // 3.执行sql语句
     const [result] = await connection.execute(statement, [userName, password])
 
@@ -63,7 +62,6 @@ class UserService {
    * @returns
    */
   async addFriend(userId, friendId, state) {
-    console.log(state)
     const statement = `INSERT INTO user_friend (userId, friendId ,state) VALUES (?, ?, ?);`
 
     const [values] = await connection.execute(statement, [

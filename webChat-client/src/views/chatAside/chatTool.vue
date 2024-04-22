@@ -177,13 +177,12 @@ const uploadFile = (item: any) => {
 /* 退出登录 */
 const logout = () => {
   socket.emit('leave', user.value)
+
+  sessionStorage.clear()
+  router.replace('./login')
+
   // 断开socket连接
   socket.disconnect()
-
-  sessionStorage.removeItem('user')
-  sessionStorage.removeItem('currentIndex')
-  sessionStorage.removeItem('userId')
-  router.replace('./login')
 }
 </script>
 

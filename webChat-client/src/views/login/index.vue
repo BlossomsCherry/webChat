@@ -21,7 +21,7 @@
             <el-input
               required
               v-model="ruleForm.userName"
-              @keyup.enter.native="msgInput"
+              @keyup.enter="msgInput"
               placeholder="用户名"
             />
           </el-form-item>
@@ -29,7 +29,7 @@
             <el-input
               required
               v-model="ruleForm.password"
-              @keyup.enter.native="msgInput"
+              @keyup.enter="msgInput"
               type="password"
               placeholder="密码"
             />
@@ -100,7 +100,6 @@ import { useLoginStore } from '@/stores/login'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
 import socket from '@/utils/socket'
-import Cookies from 'js-cookie'
 
 const ruleFormRef = ref<FormInstance>()
 const router = useRouter()
@@ -167,7 +166,6 @@ const resetForm = () => {
 }
 
 const msgInput = () => {
-  console.log('object')
   loginSubmit(ruleFormRef.value)
 }
 
@@ -185,13 +183,8 @@ const loginSubmit = (formEl: FormInstance | undefined) => {
           sessionStorage.setItem('userId', res.data.id)
           sessionStorage.setItem('user', JSON.stringify(res.data))
 
-          Cookies.set('userId', res.data.id)
-          Cookies.set('user', JSON.stringify(res.data))
-
           setToken(res.data.token)
           router.replace('/layout')
-
-          socket.emit('login', res.data)
 
           resetForm()
 

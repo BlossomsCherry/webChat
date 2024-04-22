@@ -76,7 +76,6 @@ class FriendController {
       item.createTime = item.createTime.toLocaleString()
     })
 
-    console.log(result)
     ctx.body = {
       code: 200,
       msg: '好友申请查询成功',

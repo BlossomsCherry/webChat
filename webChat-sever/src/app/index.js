@@ -30,7 +30,6 @@ app.use(
     allowHeaders: ['Content-Type', 'Authorization', 'Accept']
   })
 )
-
 app.use(bodyParser())
 app.use(useRouter.routes())
 app.use(useRouter.allowedMethods())

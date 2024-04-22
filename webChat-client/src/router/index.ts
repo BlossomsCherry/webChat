@@ -82,4 +82,9 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
+router.afterEach((to, from) => {
+  // 跳转之后滚动条回到顶部
+  window.scrollTo(0, 0)
+})
+
 export default router

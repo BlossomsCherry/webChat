@@ -88,16 +88,13 @@ onMounted(async () => {
   }
 })
 
-watch(
-  () => refresh.value,
-  () => {
-    queryGroupMessage(groupId.value).then((res: any) => {
-      allFriendMessage.value.splice(currentIndex.value, 1, res.data)
-      console.log(allFriendMessage.value)
-      refresh.value = false
-    })
-  }
-)
+watch(refresh, () => {
+  queryGroupMessage(groupId.value).then((res: any) => {
+    allFriendMessage.value.splice(currentIndex.value, 1, res.data)
+    console.log(allFriendMessage.value)
+    refresh.value = false
+  })
+})
 
 /* 添加好友/群 */
 const addClick = () => {
@@ -214,8 +211,7 @@ const getFriendAndMsg = (userId: number) => {
 
   .addFriend {
     display: flex;
-    width: 30px;
-    height: 25px;
+    padding: 7px;
     margin-left: 10px;
     border-radius: 3px;
     background-color: #f3f3f4;

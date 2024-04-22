@@ -89,7 +89,13 @@
     </el-footer>
   </el-container>
 
-  <videoBox v-if="showVideo" ref="videoRef" v-model="showVideo"></videoBox>
+  <videoBox
+    v-if="showVideo"
+    ref="videoRef"
+    v-model="showVideo"
+    :avatar="callerAvatar"
+    :userName="callerName"
+  ></videoBox>
 </template>
 
 <script setup lang="ts">
@@ -124,8 +130,7 @@ onMounted(() => {
 })
 
 // 监听消息接收事件
-socket.on('messageReceived', (senderId) => {
-  console.log(`Message received from User ${senderId}`)
+socket.on('messageReceived', () => {
   // 处理接收到的消息
   flushChatHistory()
 })
@@ -263,22 +268,26 @@ const scrollToBottom = () => {
 const videoRef = ref<any>(null)
 const showVideo = ref<boolean>(false)
 const toolClick = (index: number) => {
-  console.log(friendId.value)
+  const { userName, avatar } = JSON.parse(sessionStorage.getItem('user')!)
   if (index === 0) {
-    socket.emit('showVideo', friendId.value)
+    socket.emit('showVideo', { callId: userId, friendId: friendId.value, userName, avatar })
 
     showVideo.value = true
     setTimeout(() => {
       videoRef.value.callRemote()
-    }, 500)
+    }, 200)
   }
 }
 
 // 监听是否弹出视频通话
-socket.on('showVideo', (friendId1) => {
-  // if (friendId1 === userId) {
-  showVideo.value = true
-  // }
+const callerName = ref('')
+const callerAvatar = ref('')
+socket.on('showVideo', ({ friendId, userName, avatar }) => {
+  if (friendId == userId) {
+    showVideo.value = true
+    callerName.value = userName
+    callerAvatar.value = avatar
+  }
 })
 </script>
 

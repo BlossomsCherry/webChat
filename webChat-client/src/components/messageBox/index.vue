@@ -1,5 +1,5 @@
 <template>
-  <div :class="['chat-message', position]" :style="{ color, backgroundColor }">
+  <div :class="['chat_message', position]" :style="{ color, backgroundColor }">
     <slot>
       <span>{{ message }}</span>
     </slot>
@@ -32,7 +32,7 @@ defineProps({
 </script>
 
 <style lang="scss" scoped>
-.chat-message {
+.chat_message {
   padding: 10px 15px;
   font-size: 14px;
   border-radius: 15px;
