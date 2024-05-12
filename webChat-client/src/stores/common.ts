@@ -12,6 +12,7 @@ export const useCommonStore = defineStore('common', {
     currentIndex: number
     groupUserAvatar: any[]
     refresh: boolean
+    roomId: string
   } => ({
     tabsIndex: 0, //左侧导航栏切换
     friendList: [], //好友列表
@@ -22,7 +23,8 @@ export const useCommonStore = defineStore('common', {
     showCreateGroup: false,
     currentIndex: Number(sessionStorage.getItem('currentIndex')) || 0,
     groupUserAvatar: [],
-    refresh: false
+    refresh: false,
+    roomId: '10001'
   }),
   actions: {}
 })

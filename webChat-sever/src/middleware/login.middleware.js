@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken')
-let {
+const {
   NAME_OR_PASSWORD_IS_REQUIRED,
   NAME_IS_NOT_EXISTS,
   PASSWORD_IS_ERROR,
@@ -23,13 +23,11 @@ const verifyLogin = async (ctx, next) => {
   const user = users[0]
 
   if (!user) {
-    NAME_IS_NOT_EXISTS = new Error('用户不存在！')
     return ctx.app.emit('error', NAME_IS_NOT_EXISTS, ctx)
   }
 
   // 3.查询数据库中的密码和用户传递密码是否一致
   if (user.password !== md5password(password)) {
-    PASSWORD_IS_ERROR = new Error('密码错误！')
     return ctx.app.emit('error', PASSWORD_IS_ERROR, ctx)
   }
 
@@ -49,7 +47,6 @@ const verifyAuth = async (ctx, next) => {
   const authorization = ctx.headers.authorization
 
   if (!authorization) {
-    UN_AUTHORIZATION = new Error('未授权')
     return ctx.app.emit('error', UN_AUTHORIZATION, ctx)
   }
   const token = authorization.replace('Bearer ', '')
@@ -66,7 +63,6 @@ const verifyAuth = async (ctx, next) => {
     ctx.body = '可以访问接口'
     await next()
   } catch (error) {
-    UN_AUTHORIZATION = new Error('未授权')
     return ctx.app.emit('error', UN_AUTHORIZATION, ctx)
   }
 }

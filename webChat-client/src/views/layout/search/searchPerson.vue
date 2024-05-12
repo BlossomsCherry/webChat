@@ -59,8 +59,6 @@ onMounted(() => {
   })
 })
 
-const searchInput = () => {}
-
 /**
  * 添加好友
  * @param item

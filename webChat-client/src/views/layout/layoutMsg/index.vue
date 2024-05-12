@@ -101,7 +101,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch, nextTick, computed } from 'vue'
 import EmojiBox from '@/components/EmojiBox.vue'
-import videoBox from './videoBox.vue'
+import videoBox from '../videoBox/index.vue'
 
 import { addMessage, getChatMessage, sendGroupMessage } from '@/api'
 import { storeToRefs } from 'pinia'
@@ -127,12 +127,12 @@ onMounted(() => {
     scrollToBottom()
     indexFriend.value = friendList.value[currentIndex.value]
   }, 200)
-})
 
-// 监听消息接收事件
-socket.on('messageReceived', () => {
-  // 处理接收到的消息
-  flushChatHistory()
+  // 监听消息接收事件
+  socket.on('messageReceived', () => {
+    // 处理接收到的消息
+    flushChatHistory()
+  })
 })
 
 /* 监听当前聊天对象变化，重新获取聊天记录 */

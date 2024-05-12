@@ -5,9 +5,8 @@ import WRequest from '../request'
  * @returns
  */
 export function searchAllPerson() {
-  return WRequest.request({
-    url: '/user/searchAllPerson',
-    method: 'post'
+  return WRequest.post({
+    url: '/user/searchAllPerson'
   })
 }
 
@@ -29,8 +28,7 @@ export function addFriend(data: addFriend) {
  * @returns
  */
 export function getUserAvatar(userId: number) {
-  return WRequest.request({
-    url: `/user/getAvatar/${userId}`,
-    method: 'get'
+  return WRequest.get({
+    url: `/user/getAvatar/${userId}`
   })
 }

@@ -12,7 +12,11 @@ friendRouter.post(
   verifyAuth,
   FriendController.getChatMessage
 )
-friendRouter.post('/friendApply', FriendController.friendApplyList)
-friendRouter.post('/updateFriendState', FriendController.updateFriendState)
+friendRouter.post('/friendApply', verifyAuth, FriendController.friendApplyList)
+friendRouter.post(
+  '/updateFriendState',
+  verifyAuth,
+  FriendController.updateFriendState
+)
 
 module.exports = friendRouter

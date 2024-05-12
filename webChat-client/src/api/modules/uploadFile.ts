@@ -8,7 +8,6 @@ import WRequest from '../request'
 export function uploadAvatar(data: any) {
   return WRequest.post({
     url: '/file/avatar',
-    method: 'post',
     data
   })
 }

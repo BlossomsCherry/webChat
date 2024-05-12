@@ -9,6 +9,7 @@ const friendRouter = require('../router/friend')
 const emojiRouter = require('../router/emoji')
 const fileRouter = require('../router/upload')
 const groupRouter = require('../router/group')
+const roomRouter = require('../router/chatRoom')
 
 // 1. 创建app
 const app = new Koa()
@@ -17,12 +18,7 @@ const httpServer = createServer(app.callback())
 // 2. 对app使用中间件
 app.use(
   cors({
-    origin: function (ctx) {
-      if (ctx.url === '/test') {
-        return false
-      }
-      return '*'
-    },
+    origin: 'http://localhost:5173',
     exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
     maxAge: 5,
     credentials: true,
@@ -43,5 +39,7 @@ app.use(fileRouter.routes())
 app.use(fileRouter.allowedMethods())
 app.use(groupRouter.routes())
 app.use(groupRouter.allowedMethods())
+app.use(roomRouter.routes())
+app.use(roomRouter.allowedMethods())
 
-module.exports = httpServer
+module.exports = { httpServer, app }

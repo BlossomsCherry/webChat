@@ -9,7 +9,9 @@
         <!-- 聊天页组件 -->
         <layoutMsg v-if="tabsIndex === 0"></layoutMsg>
 
-        <friend-and-group v-if="tabsIndex !== 0"></friend-and-group>
+        <friend-and-group v-if="tabsIndex === 1"></friend-and-group>
+
+        <chatRoom v-if="tabsIndex === 2"></chatRoom>
       </el-container>
     </div>
 
@@ -26,15 +28,16 @@
 
 <script lang="ts" setup>
 import { ElNotification } from 'element-plus'
-import searchPerson from './searchPerson.vue'
-import layoutMsg from './layoutMsg.vue'
-import friendAndGroup from './friendAndGroup.vue'
-import createGroup from './createGroup.vue'
-import layoutGroup from './layoutGroup.vue'
+import searchPerson from './search/searchPerson.vue'
+import layoutMsg from './layoutMsg/index.vue'
+import friendAndGroup from './applyNotice/index.vue'
+import createGroup from './group/createGroup.vue'
+import layoutGroup from './group/layoutGroup.vue'
+import chatRoom from './chatRoom/index.vue'
+import chatAside from '../chatAside/index.vue'
 import 'element-plus/theme-chalk/el-notification.css'
 
 import { onUnmounted, onMounted } from 'vue'
-import chatAside from '../chatAside/index.vue'
 import { friendApplyList } from '@/api'
 import { useUserStore } from '@/stores/user'
 import { useCommonStore } from '@/stores/common'
@@ -111,7 +114,7 @@ onMounted(() => {
 }
 
 :deep(.el-container) {
-  padding-left: 0 !important;
+  padding: 0 !important;
 }
 
 .chat_layout {

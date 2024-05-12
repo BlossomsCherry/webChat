@@ -7,7 +7,7 @@ export function getToken() {
   return sessionStorage.getItem(TOKEN_KEY)
 }
 
-export function setToken(token) {
+export function setToken(token: any) {
   // return Cookies.set(TOKEN_KEY, token)
   return sessionStorage.setItem(TOKEN_KEY, token)
 }

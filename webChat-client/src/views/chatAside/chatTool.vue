@@ -95,7 +95,7 @@
 import { getCurrentInstance, ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import socket from '@/utils/socket'
-import { uploadAvatar, getUserAvatar } from '@/api'
+import { uploadAvatar } from '@/api'
 import { useCommonStore } from '@/stores/common'
 import { storeToRefs } from 'pinia'
 import { ElMessage } from 'element-plus'
@@ -115,7 +115,7 @@ const user: any = computed(() => {
 const iconList = ref([
   { name: 'icon-message-dots', path: '/chat' },
   { name: 'icon-users', path: '/friend' },
-  { name: 'icon-grid', path: '' },
+  { name: 'icon-grid', path: '/chatRoom' },
   { name: 'icon-github', path: '' },
   { name: 'icon-shezhi', path: '' }
 ])
@@ -146,7 +146,6 @@ const showUserInfo = () => {
 /* 上传头像 */
 const imageUrl = ref(user.value.avatar)
 const uploadFile = (item: any) => {
-  // event.preventDefault()
   let formData = new FormData()
   formData.append('avatar', item.raw)
 
@@ -158,7 +157,6 @@ const uploadFile = (item: any) => {
   //   formData.append('avatar', file)
 
   uploadAvatar(formData).then((res: any) => {
-    // window.location.reload()
     imageUrl.value = res.data
 
     if (res.code === 200) {
@@ -166,12 +164,8 @@ const uploadFile = (item: any) => {
         type: 'success',
         message: '头像上传成功'
       })
-
-      // 获取头像
-      getUserAvatar(11)
     }
   })
-  // }
 }
 
 /* 退出登录 */

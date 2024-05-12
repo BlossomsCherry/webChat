@@ -3,28 +3,28 @@ import { baseURL, TIMEOUT } from './config'
 import { getToken } from '@/utils/saveToken'
 
 class WRequest {
-  constructor(baseURL) {
+  constructor(baseURL: string) {
     this.instance = axios.create({
       baseURL,
       timeout: TIMEOUT
     })
   }
 
-  request(config) {
+  request(config: any) {
     return new Promise((resolve, reject) => {
       this.instance
         .request(config)
-        .then((res) => {
+        .then((res: any) => {
           resolve(res.data)
         })
-        .catch((err) => {
+        .catch((err: any) => {
           console.log('request err:', err)
           reject(err)
         })
     })
   }
 
-  get(config) {
+  get(config: any) {
     return this.request({
       ...config,
       method: 'get',
@@ -34,7 +34,7 @@ class WRequest {
     })
   }
 
-  post(config) {
+  post(config: any) {
     return this.request({
       ...config,
       method: 'post',

@@ -230,13 +230,10 @@ const hangupCall = async () => {
   // 通知对方挂断
   socket.value?.emit('hangup', roomId)
 }
-
-
 </script>
 
 <template>
   <div class="app">
- 
     <div
       class="w-80 h-4/5 rounded-2xl absolute left-1/2 -translate-x-1/2 bg-gray-200"
     >
@@ -327,35 +324,34 @@ const hangupCall = async () => {
 <style scoped>
 .app {
   height: 100vh;
+}
+.button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  border: none;
+  background-color: #e8584b;
+}
 
-  .button {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 100%;
-    border: none;
-    background-color: #e8584b;
-  }
+.button:hover {
+  background-color: #e52441;
+}
 
-  .button:hover {
-    background-color: #e52441;
-  }
+.button1 {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 100%;
+  border: none;
+  background-color: #30c04f;
+}
 
-  .button1 {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 60px;
-    height: 60px;
-    border-radius: 100%;
-    border: none;
-    background-color: #30c04f;
-  }
-
-  .button1::after {
-    background-color: #2bac47;
-  }
+.button1::after {
+  background-color: #2bac47;
 }
 </style>

@@ -6,11 +6,23 @@ const { verifyAuth } = require('../middleware/login.middleware')
 const groupRouter = new koaRouter({ prefix: '/group' })
 
 /* 2.定义路由映射 */
-groupRouter.post('/createGroup', GroupController.createGroup)
-groupRouter.post('/joinGroup', GroupController.joinGroup)
-groupRouter.post('/searchGroup', GroupController.searchGroup)
-groupRouter.post('/searchGroupMember', GroupController.searchGroupMember)
-groupRouter.post('/sendGroupMessage', GroupController.sendGroupMessage)
-groupRouter.post('/queryGroupMessage', GroupController.queryGroupMessage)
+groupRouter.post('/createGroup', verifyAuth, GroupController.createGroup)
+groupRouter.post('/joinGroup', verifyAuth, GroupController.joinGroup)
+groupRouter.post('/searchGroup', verifyAuth, GroupController.searchGroup)
+groupRouter.post(
+  '/searchGroupMember',
+  verifyAuth,
+  GroupController.searchGroupMember
+)
+groupRouter.post(
+  '/sendGroupMessage',
+  verifyAuth,
+  GroupController.sendGroupMessage
+)
+groupRouter.post(
+  '/queryGroupMessage',
+  verifyAuth,
+  GroupController.queryGroupMessage
+)
 
 module.exports = groupRouter

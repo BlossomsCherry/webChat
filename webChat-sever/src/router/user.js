@@ -7,11 +7,10 @@ const { verifyAuth } = require('../middleware/login.middleware')
 const useRouter = new koaRouter({ prefix: '/user' })
 
 /* 2.定义路由映射 */
-// 用户注册接口
 useRouter.post('/register', verifyUser, handlePassword, UserController.create)
-useRouter.post('/searchAllPerson', UserController.searchAllPerson)
+useRouter.post('/searchAllPerson', verifyAuth, UserController.searchAllPerson)
 useRouter.post('/search', verifyAuth, UserController.search)
-useRouter.post('/addFriend', UserController.addFriend)
+useRouter.post('/addFriend', verifyAuth, UserController.addFriend)
 useRouter.post(
   '/updateFriendState',
   verifyAuth,

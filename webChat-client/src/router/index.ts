@@ -19,7 +19,7 @@ const routes: RouteRecordRaw[] = [
   {
     path: '/layout',
     name: 'layout',
-    component: () => import('@/views/layout/layout.vue'),
+    component: () => import('@/views/layout/index.vue'),
     children: [
       {
         path: '/chat',
@@ -30,13 +30,13 @@ const routes: RouteRecordRaw[] = [
         path: '/friend',
         name: 'friend',
         component: () => import('@/views/chatAside/chatFriend.vue')
+      },
+      {
+        path: '/chatRoom',
+        name: 'chatRoom',
+        component: () => import('@/views/chatAside/chatRoom.vue')
       }
     ]
-  },
-  {
-    path: '/test',
-    name: 'test',
-    component: () => import('@/views/layout/test.vue')
   }
 ]
 
@@ -82,7 +82,7 @@ router.beforeEach((to, from, next) => {
   next()
 })
 
-router.afterEach((to, from) => {
+router.afterEach(() => {
   // 跳转之后滚动条回到顶部
   window.scrollTo(0, 0)
 })

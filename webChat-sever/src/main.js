@@ -1,4 +1,4 @@
-const httpServer = require('./app')
+const { httpServer } = require('./app')
 const { SERVER_POST } = require('./config/sever')
 const { Server } = require('socket.io')
 require('./utils/error')
@@ -38,6 +38,20 @@ io.on('connection', socket => {
     console.log(`收到客户端${socket.id}的心跳消息`)
     // 发送心跳响应给客户端
     socket.emit('heartbeat')
+  })
+
+  /* ---------------------------------- 聊天室 ---------------------------------- */
+  socket.on('joinChatRoom', ({ roomId, userName }) => {
+    socket.join(roomId)
+    io.to(roomId).emit('joinChatRoom', userName)
+  })
+
+  socket.on('leaveChatRoom', ({ roomId, userName }) => {
+    io.to(roomId).emit('leaveChatRoom', userName)
+  })
+
+  socket.on('getMessage', roomId => {
+    io.to(roomId).emit('getMessage', roomId)
   })
 
   /* ---------------------------------- 视频通话 ---------------------------------- */

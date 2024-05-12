@@ -1,12 +1,9 @@
 <template>
   <div class="chat-login">
     <div class="container">
-      <div class="display-1 t">
-        <span class="title">欢迎</span>
-        <span class="title">加入</span>
-        <span class="title">WebChat</span>
-      </div>
+      <span class="title">欢迎加入WebChat</span>
     </div>
+
     <div class="container-app">
       <!-- 登录 -->
       <div class="login">
@@ -91,7 +88,7 @@
 import { ElNotification } from 'element-plus'
 import 'element-plus/theme-chalk/el-notification.css'
 
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import type { FormInstance, FormRules } from 'element-plus'
 import { login, register } from '@/api'
@@ -99,7 +96,6 @@ import { setToken } from '@/utils/saveToken'
 import { useLoginStore } from '@/stores/login'
 import { useUserStore } from '@/stores/user'
 import { storeToRefs } from 'pinia'
-import socket from '@/utils/socket'
 
 const ruleFormRef = ref<FormInstance>()
 const router = useRouter()
@@ -252,15 +248,6 @@ const loginClick = () => {
 
   flag.value = true
 }
-
-/* 标题动画 */
-onMounted(() => {
-  const title: any = document.getElementsByClassName('title')
-
-  for (let i = 0; i < title.length; i++) {
-    title[i].style.animationDelay = i * 0.1 + 's'
-  }
-})
 </script>
 
 <style lang="less" scoped>
@@ -282,25 +269,8 @@ onMounted(() => {
     font-size: 40px;
     color: #fff;
     font-weight: 800;
-    .t {
-      display: flex;
-      overflow: hidden;
-      animation-name: hc;
-      animation-duration: 1s;
-      animation-fill-mode: both;
-    }
-
-    @keyframes hc {
-      form {
-        transform: translateY(40%);
-        opacity: 0;
-      }
-      to {
-        transform: translateY(40%);
-        opacity: 1;
-      }
-    }
   }
+
   .container-app {
     position: absolute;
     display: flex;
